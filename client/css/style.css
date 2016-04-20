@@ -26,6 +26,14 @@ body {
   padding-bottom: 30px;
 }
 
+.enroll_btn {
+	align: center;
+    margin: auto; 
+  padding-top: 20px;
+  padding-bottom: 20px;
+	display: block;
+ 
+}
 
 .form-control {
   padding-right: 30px;

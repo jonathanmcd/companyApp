@@ -1,5 +1,5 @@
 	var companyApp = angular.module('companyApp', ['ngRoute']);
-
+	
     companyApp.config(['$routeProvider',
       function($routeProvider) {
 		console.log('Inside routing');
@@ -28,6 +28,10 @@
             templateUrl: 'partials/contact.html',
             controller: 'ContactCtrl'
           })
+          .when('/booking', {
+            templateUrl: 'partials/booking.html',
+            controller: 'BookingCtrl'
+          })		  
           .when('/', {
 			templateUrl: 'partials/home.html',
             controller: 'HomeCtrl'
@@ -54,18 +58,26 @@
 		$rootScope.pageTitle = "Contact Us";		
 	});		
 
+	companyApp.controller('BookingCtrl', function($rootScope, $scope) {
+		console.log('Inside BookingCtrl');		
+		$rootScope.pageTitle = "Booking Form";		
+	});	
+	
 	companyApp.controller('CourseCFRCtrl', function($rootScope, $scope) {
 		console.log('Inside CourseCFRCtrl');		
 		$rootScope.pageTitle = "Cardiac First Responder";		
 	});	
+	
 	companyApp.controller('CourseOFACtrl', function($rootScope, $scope) {
 		console.log('Inside CourseOFACtrl');		
 		$rootScope.pageTitle = "Occupational First Aid";		
 	});	
+	
 	companyApp.controller('CourseOFARCtrl', function($rootScope, $scope) {
 		console.log('Inside CourseOFARCtrl');		
 		$rootScope.pageTitle = "Occupational First Aid Refresher";		
 	});	
+	
 	companyApp.controller('CourseEFACtrl', function($rootScope, $scope) {
 		console.log('Inside CourseEFACtrl');		
 		$rootScope.pageTitle = "Emergency First Aid";		

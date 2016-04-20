@@ -11,6 +11,8 @@
 		<script type="text/javascript" src="scripts/angular-route.min.js"></script>   <!-- NEW Line --> 
 		<link type="text/css" rel="stylesheet" href="css/style.css" />
 		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<!-- This line is necessary to support $location HTML5 mode (for query string parameters). -->
+		<base href="/">		
 	</head>
 	<body>  
 		<div ng-view ></div>

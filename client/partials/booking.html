@@ -1,6 +1,6 @@
 		<div class="container theme-showcase" role="main">	
 			<div class="header">
-				<img class="logo" src="img/logo.jpg" alt="First Aid Responder Training Logo" style="width:406px;height:74px;" />
+				<a href="#/admin"><img class="logo" src="img/logo.jpg" alt="First Aid Responder Training Logo" style="width:406px;height:74px;" /></a>
 			</div>	
 			<!-- Navigation -->
 			<nav class="navbar navbar-default" role="navigation">
@@ -26,7 +26,8 @@
 							  <li><a href="#/course/ofar">Occupational First Aid Refresher</a></li>
 							  <li><a href="#/course/efa">Emergency First Aid</a></li>
 							</ul>
-						</li>					
+						</li>
+						<li><a href="#/course/upcoming">Upcoming Courses</a></li>
 						<li class="active"><a href="#">Booking</a></li>
 						<li><a href="#/contact">Contact</a></li>
 					  </ul>
@@ -35,47 +36,103 @@
 			</nav>
 			
 			<h1>Booking</h1>
-			<p>Please fill in the following form to enroll in a course, and a member of staff will be in contact with you soon: </p>
-			
-			<form role="form">
-			  <div class="form-group">
-				  <label for="sel1">Course:</label>
-				  <select class="form-control" id="sel1">
-					  <option value="cfr">Cardiac First Responder</option>
-					  <option value="ofa">Occupational First Aid</option>
-					  <option value="ofar">Occupational First Aid Refresher</option>
-					  <option value="efa">Emergency First Aid</option>
-				  </select>
-			  </div>
-			  <div class="form-group">
-				  <label for="sel1">Date & Venue:</label>
-				  <select class="form-control" id="sel1">
-					  <option value="WTD29052016">29th May 2016 - Waterford City</option>
-					  <option value="KK29052016">29th May 2016 - Kilkenny</option>
-					  <option value="WTD15072016">15th July 2016 - Waterford City</option>
-					  <option value="WTD05082016">5th August 2016 - Waterford City</option>
-				  </select>
-			  </div>			  
-			  <div class="form-group">
-				<label for="name">Name:</label>
-				<input type="text" class="form-control" id="name" placeholder="Enter your name here." required>
+			<span ng-show="displayAll == true && courses.length == 0"> 
+			  <div class="alert alert-warning">	  
+				<p>Unfortunately there is no planned upcoming public courses, 
+				however we are always interested to hear from people if they wish for us to run a course. 
+				Please take a moment to contact us to express an interest in a course.</p>
 			  </div>			
-			  <div class="form-group">
-				<label for="email">Email address:</label>
-				<input type="email" class="form-control" id="email" placeholder="Enter email address here." required>
-			  </div>
-			  <div class="form-group">
-				<label for="phone">Phone:</label>
-				<input type="tel" class="form-control" id="phone" placeholder="Enter phone number here." required>
-			  </div>	
-			  <div class="form-group">
-				<label for="address1">Address:</label>
-				<input type="text" class="form-control" id="address1" placeholder="Enter your address here." required>
-			  </div>	
-			  <button type="submit" class="btn btn-default" onClick="console.log('Email from website from ' +document.getElementById('name').value + ' (' + document.getElementById('email').value + ')')">Submit</button>
-			</form>
+			</span>
 		
+			<span ng-show="displayAll == true && courses.length > 1  && addBookingStatus != 'success'">
+				<p>Please fill in the following form to enroll in a course, and a member of staff will be in contact with you soon: </p>
+				
+				<form name="postForm1" ng-submit="addBooking()">
+					<div class="form-group">
+						<label for="type_code">Course:</label>
+						<select class="form-control" id="type_code" ng-model="selectCourseType">
+							<option ng-repeat="courseType in courseTypes" title="{{courseType.code}}"  value="{{courseType.code}}">{{courseType.name.toUpperCase()}}</option>
+						</select>												
+					</div>
+					<div class="form-group">
+						<label for="code">Date & Venue:</label>
+						<span ng-show="!selectCourseType">
+							<select class="form-control" id="code" ng-readonly="!selectCourseType">
+								<option></option>
+							</select>
+						</span>	
+						<span ng-show="selectCourseType">
+							<select ng-model="newBooking.code" class="form-control" id="code" ng-readonly="!selectCourseType">
+								<option ng-repeat="course in courses| filter:{type_code:selectCourseType}:true" title="{{course.name}}"  value="{{course.code}}">{{course.startdate}} - {{course.location}}</option>
+							</select>		
+						</span>						  
+					</div>			  
+					<div class="form-group">
+						<label for="name">Name:</label>
+						<input type="text" ng-model="newBooking.name" class="form-control" id="name" name='name' placeholder="Enter your name here." required ng-maxlength="50">
+					</div>			
+					<div class="form-group">
+						<label for="email">Email address:</label>
+						<input type="email" ng-model="newBooking.email" class="form-control" id="email" name='email' placeholder="Enter email address here." required>
+					</div>
+					<div class="form-group">
+						<label for="phone">Phone:</label>
+						<input type="tel" ng-model="newBooking.phone" class="form-control" id="phone" name='phone' placeholder="Enter phone number here." required>
+					</div>	
+					<div class="form-group">
+						<label for="address1">Address:</label>
+						<input type="text" ng-model="newBooking.address1"  class="form-control" id="address1" placeholder="Enter your address here." required>
+					</div>
+					<button type="submit" class="btn btn-primary" ng-disabled="postForm1.$pristine || (postForm1.$dirty && postForm1.$invalid) ">Submit</button>					
+				</form>		
+			</span>
+		
+		
+			<span ng-show="displayAll == false && addBookingStatus != 'success'">	
+				<p>Please fill in the following form to enroll in a course, and a member of staff will be in contact with you soon: </p>		
+				<form name="postForm2" ng-submit="addBooking()">
+					<div class="form-group">
+						<label for="type_code">Course:</label>
+						<select class="form-control" id="type_code"  readonly="readonly">
+							<option ng-init="newBooking.type_code=course.type_code" ng-model="newBooking.type_code" value="{{course.type_code}}" selected="selected">{{course.name}}</option>
+						</select>
+					</div>
+					<div class="form-group">
+						<label for="code">Date & Venue:</label>
+						<select class="form-control" id="code"  readonly="readonly">
+							<option ng-init="newBooking.code=course.code" ng-model="newBooking.code" value="{{course.code}}" selected="selected">{{course.startdate}} - {{course.location}}</option>
+						</select>
+					</div>			  
+					<div class="form-group">
+						<label for="name">Name:</label>
+						<input type="text" ng-model="newBooking.name" class="form-control" id="name" name='name' placeholder="Enter your name here." required ng-maxlength="50">
+					</div>			
+					<div class="form-group">
+						<label for="email">Email address:</label>
+						<input type="email" ng-model="newBooking.email" class="form-control" id="email" name='email' placeholder="Enter email address here." required>
+					</div>
+					<div class="form-group">
+						<label for="phone">Phone:</label>
+						<input type="tel" ng-model="newBooking.phone" class="form-control" id="phone" name='phone' placeholder="Enter phone number here." required>
+					</div>	
+					<div class="form-group">
+						<label for="address1">Address:</label>
+						<input type="text" ng-model="newBooking.address1"  class="form-control" id="address1" placeholder="Enter your address here." required>
+					</div>
+					<button type="submit" class="btn btn-primary" ng-disabled="postForm2.$pristine || (postForm2.$dirty && postForm2.$invalid) ">Submit</button>					
+				</form>		  
+			</span>
+			
+			<span ng-show="addBookingStatus == 'success'">
+			  <div class="alert alert-success">	  
+				<p>Thank you for submitting you booking, a member of staff will be in touch with you before the course begins.</p>
+			  </div>			
+				
+			</span>			
 		</div>
+		
+		
+
 	
 
 

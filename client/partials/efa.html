@@ -1,6 +1,6 @@
 		<div class="container theme-showcase" role="main">	
 			<div class="header">
-				<img class="logo" src="img/logo.jpg" alt="First Aid Responder Training Logo" style="width:406px;height:74px;" />
+				<a href="#/admin"><img class="logo" src="img/logo.jpg" alt="First Aid Responder Training Logo" style="width:406px;height:74px;" /></a>
 			</div>	
 			<!-- Navigation -->
 			<nav class="navbar navbar-default" role="navigation">
@@ -26,7 +26,8 @@
 							  <li><a href="#/course/ofar">Occupational First Aid Refresher</a></li>
 							  <li><a href="#/course/efa">Emergency First Aid</a></li>
 							</ul>
-						</li>					
+						</li>
+						<li><a href="#/course/upcoming">Upcoming Courses</a></li>
 						<li><a href="#/booking">Booking</a></li>
 						<li><a href="#/contact">Contact</a></li>
 					  </ul>
@@ -64,11 +65,73 @@
 
 			<h2>Course Certification</h2>
 			<p>The candidates are presented with a certificate of attendance.</p>
-			<div class="enroll_btn">	
-				<form method="get" action="#/booking?course=efa">
-					<button type="submit">Enroll</button>
-				</form>
-			</div>			
+		
+			<h1>Upcoming Courses</h1>
+			<span ng-show="courses.length == 0">
+			  <div class="alert alert-warning">	  
+				<p>Unfortunately there is no planned upcoming public EMERGENCY FIRST AID courses, 
+				however we are always interested to hear from people if they wish for us to run a course. 
+				Please take a moment to contact us to express an interest in a course.</p>
+			  </div>			
+				
+			</span>				
+			<span ng-show="courses.length != 0">			  
+				<form>
+					<div class="form-group">
+					  <div class="input-group">
+						<div class="input-group-addon"><i class="fa fa-search"></i></div>
+
+						<input type="text" class="form-control" placeholder="Search for a course" ng-model="searchCourse">
+
+					  </div>      
+					</div>
+				</form>			  
+				<table class="table table-bordered table-striped"> 
+					<thead>
+					  <tr>
+						<td>
+							<a href="" ng-click="sortType = 'startdate'; sortReverse = !sortReverse">
+							Date
+							<span ng-show="sortType == 'startdate' && !sortReverse" class="fa fa-caret-down"></span>
+							<span ng-show="sortType == 'startdate' && sortReverse" class="fa fa-caret-up"></span>
+							</a>
+						</td>
+						<td>
+							<a href="" ng-click="sortType = 'code'; sortReverse = !sortReverse">
+							<span ng-show="sortType == 'code' && !sortReverse" class="fa fa-caret-down"></span>
+							<span ng-show="sortType == 'code' && sortReverse" class="fa fa-caret-up"></span>
+							Course Code</a>
+						</td>
+						<td>
+							<a href="" ng-click="sortType = 'name'; sortReverse = !sortReverse">
+							<span ng-show="sortType == 'name' && !sortReverse" class="fa fa-caret-down"></span>
+							<span ng-show="sortType == 'name' && sortReverse" class="fa fa-caret-up"></span>
+							Course Name</a>
+						</td>
+						<td>
+							<a href="" ng-click="sortType = 'location'; sortReverse = !sortReverse">
+							<span ng-show="sortType == 'location' && !sortReverse" class="fa fa-caret-down"></span>
+							<span ng-show="sortType == 'location' && sortReverse" class="fa fa-caret-up"></span>
+							Location</a>
+						</td>	
+						<td></td>			
+					  </tr>
+					</thead>
+
+					
+					<tbody>
+					  <tr ng-repeat="course in courses | orderBy:sortType:sortReverse| filter:searchCourse">
+						  <td>{{course.startdate}}</td>
+						  <td>{{course.code}}</td>
+						  <td>{{course.name}}</td>
+						  <td>{{course.location}}</td>		
+						  <td>
+							<a href="#/booking/{{course.code}}" class="btn btn-success">Enrol</a>
+						  </td>	  
+					  </tr>
+					</tbody>
+				</table>
+			</span>				
 		</div>
 	
 

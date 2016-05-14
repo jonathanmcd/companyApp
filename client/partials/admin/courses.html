@@ -1,0 +1,187 @@
+		<div class="container theme-showcase" role="main">	
+			<div class="header">
+				<a href="#/"><img class="logo" src="img/logo-admin.jpg" alt="Admin Console" style="width:406px;height:74px;" /></a>
+			</div>	
+
+
+			<span ng-show="viewCode == 'addNewCourseForm'">
+				<h1>Maintain Courses - Add NEW Course</h1>			
+				<form name="postForm1" ng-submit="addNewCourseSubmit()">
+					<div class="form-group">
+						<label for="type_code">Course:</label>
+						<select class="form-control" ng-model="newCourse.type_code" id="type_code">
+							<option ng-repeat="courseType in courseTypes"   title="{{courseType.name}}"  value="{{courseType.code}}">{{courseType.name.toUpperCase()}}</option>
+						</select>												
+					</div>				  					
+					<div class="form-group">
+						<label for="startdate">Date:</label>
+						<input type="date" ng-model="newCourse.startdate" class="form-control" id="startdate" name='startdate' placeholder="Enter start date.">
+					</div>	
+					<div class="form-group">
+						<label for="location">Location:</label>
+						<input type="text" ng-model="newCourse.location" class="form-control" id="location" name='location' placeholder="Enter location here." required>
+					</div>					
+					<div class="form-group">
+						<label for="status">Status:</label>
+						<select class="form-control" ng-model="newCourse.status" id="status">
+							<option ng-init="newCourse.status=='DRAFT'"  ng-repeat="courseStatus in courseStatuses" title="{{courseStatus.code}}"  value="{{courseStatus.code}}">{{courseStatus.code}} - {{courseStatus.desc}}</option>
+						</select>								
+					</div>			
+					<button type="submit" class="btn btn-primary" ng-disabled="postForm1.$pristine || (postForm1.$dirty && postForm1.$invalid) ">Submit</button>					
+				</form>		
+			</span>			
+
+			<span ng-show="viewCode == 'viewCourse'">
+				<h1>Maintain Course - state = {{course.state}}</h1>
+				<h2>{{course.name.toUpperCase()}} ({{course.code}})</h2>
+				<table class="table table-bordered table-striped"> 
+					<thead>
+					  <tr>
+						<td>Location</td>
+						<td>Start Date</td>							
+						<td>Status</td>							
+						<td></td>
+						<td></td>				
+					  </tr>
+					</thead>
+					<tbody>	
+						<div ng-switch="course.state">
+							<div ng-switch-when="edit">
+								<h1>EDit</h1>
+							</div>	
+							<div ng-switch-when="normal">												
+								<tr>
+									<td>{{course.location}}</td>							
+									<td>{{course.startdate}}</td>
+									<td>{{course.status.toUpperCase()}}</td>					  			  
+									<td>
+										<input type="button" class="btn btn-primary" ng-click="editCourse(course)" value="Edit" />
+									</td>
+									<td>
+										<input type="button" class="btn btn-danger" ng-click="deleteCourse(course)" value="Delete"/>
+									</td>
+								</tr>
+							</div>
+							<div ng-switch-when="deleted">
+								<tr class="danger">
+									<td>{{course.location}}</td>							
+									<td>{{course.startdate}}</td>
+									<td>{{course.status.toUpperCase()}}</td>					  			  
+									<td>
+										<input type="button" class="btn btn-danger" ng-click="deleteCourseConfirm(course)" value="Confirm" />
+									</td>
+									<td>
+										<input type="button" class="btn btn-success" ng-click="deleteCourseUndo(course)" value="Undo"/>
+									</td>
+								</tr>
+							</div>	
+						</div>						
+					</tbody>
+				</table>
+			</span>			
+			
+
+
+			<span ng-show="viewCode == 'addNewStudentForm'">			
+			</span>	
+			
+			<span ng-show="viewCode == 'maintainCourses'">
+				<h1>Maintain Courses</h1>	
+				  <div class="alert alert-info">
+					<a href="" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+					<p>Sort Type: {{ sortType }}</p>
+					<p>Sort Reverse: {{ sortReverse }}</p>
+					<p>Search Query: {{ searchCourse }}</p>
+				  </div>	  
+				<form>
+					<div class="form-group">
+					  <div class="input-group">
+						<div class="input-group-addon"><i class="fa fa-search"></i></div>
+						<input type="text" class="form-control" placeholder="Search for a course" ng-model="searchCourse">
+					  </div>      
+					</div>
+				</form>
+				<p><input type="button" class="btn btn-success" ng-click="addNewCourseView()" value="Add NEW Course" /></p>
+				<table class="table table-bordered table-striped"> 
+					<thead>
+					  <tr>
+						<td>
+							<a href="#/admin/courses" ng-click="sortType = 'startdate'; sortReverse = !sortReverse">
+							Date
+							<span ng-show="sortType == 'startdate' && !sortReverse" class="fa fa-caret-down"></span>
+							<span ng-show="sortType == 'startdate' && sortReverse" class="fa fa-caret-up"></span>
+							</a>
+						</td>
+						<td>
+							<a href="#/admin/courses" ng-click="sortType = 'code'; sortReverse = !sortReverse">
+							<span ng-show="sortType == 'code' && !sortReverse" class="fa fa-caret-down"></span>
+							<span ng-show="sortType == 'code' && sortReverse" class="fa fa-caret-up"></span>
+							Course Code</a>
+						</td>
+						<td>
+							<a href="#/admin/courses" ng-click="sortType = 'name'; sortReverse = !sortReverse">
+							<span ng-show="sortType == 'name' && !sortReverse" class="fa fa-caret-down"></span>
+							<span ng-show="sortType == 'name' && sortReverse" class="fa fa-caret-up"></span>
+							Course Name</a>
+						</td>
+						<td>
+							<a href="#/admin/courses" ng-click="sortType = 'location'; sortReverse = !sortReverse">
+							<span ng-show="sortType == 'location' && !sortReverse" class="fa fa-caret-down"></span>
+							<span ng-show="sortType == 'location' && sortReverse" class="fa fa-caret-up"></span>
+							Location</a>
+						</td>
+						<td>
+							<a href="#/admin/courses" ng-click="sortType = 'status'; sortReverse = !sortReverse">
+							<span ng-show="sortType == 'status' && !sortReverse" class="fa fa-caret-down"></span>
+							<span ng-show="sortType == 'status' && sortReverse" class="fa fa-caret-up"></span>
+							Status</a>
+						</td>
+						<td>
+							<a href="#/admin/courses" ng-click="sortType = 'status'; sortReverse = !sortReverse">
+							<span ng-show="sortType == 'status' && !sortReverse" class="fa fa-caret-down"></span>
+							<span ng-show="sortType == 'status' && sortReverse" class="fa fa-caret-up"></span>
+							Total Bookings</a>
+						</td>					
+						<td></td>
+						<td></td>				
+					  </tr>
+					</thead>
+				
+					<tbody ng-repeat="course in courses | orderBy:sortType:sortReverse| filter:searchCourse" ng-switch="course.state">
+						<tr class="danger" ng-switch-when="deleted">
+						  <td>{{course.startdate}}</td>
+						  <td>{{course.code}}</td>
+						  <td>{{course.name.toUpperCase()}}</td>
+						  <td>{{course.location}}</td>	
+						  <td>{{course.status.toUpperCase()}}</td>
+						  <td>{{course.students.length}}</td>	
+						  <td>
+							<input type="button" class="btn btn-danger" ng-click="deleteCourseConfirm(course)" value="Confirm" />
+						  </td>
+						  <td>
+							<input type="button" class="btn btn-success" ng-click="deleteCourseUndo(course)" value="Undo"/>
+						  </td>
+						</tr>				
+						<!-- Normal Mode Template -->
+						<tr ng-switch-default>
+						  <td>{{course.startdate}}</td>
+						  <td>{{course.code}}</td>
+						  <td>{{course.name.toUpperCase()}}</td>
+						  <td>{{course.location}}</td>	
+						  <td>{{course.status.toUpperCase()}}</td>
+						  <td>{{course.students.length}}</td>						  			  
+						  <td>
+							<input type="button" class="btn btn-primary" ng-click="viewCourse(course)" value="View/Edit" />
+						  </td>
+						  <td>
+							<input type="button" class="btn btn-danger" ng-click="deleteCourse(course)" value="Delete"/>
+						  </td>
+					  </tr>
+					</tbody>
+				</table>
+			</span>				
+		</div>
+	
+
+
+

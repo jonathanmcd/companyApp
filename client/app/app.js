@@ -81,6 +81,7 @@ companyApp.controller('AdminCoursesCtrl', function($rootScope, $scope, $routePar
 	$scope.sortReverse = false; // set the default sort order
 	$scope.searchCourse = ''; // set the default search/filter term	
 	$scope.viewCode = "maintainCourses";
+
 	
 	$scope.deleteCourse = function(course) {
 		course.state = "deleted";
@@ -92,6 +93,7 @@ companyApp.controller('AdminCoursesCtrl', function($rootScope, $scope, $routePar
 		console.log('[START] deleteCourseConfirm('+course.code+') ');
 		console.log('[DEBUG] Deleting at persistence level');		
 		$scope.courses = CoursesService.deleteByCode(course.code);
+		$scope.viewCode = "maintainCourses";
 	}	
 	$scope.addNewCourseView = function() {
 		$scope.viewCode = "addNewCourseForm";
@@ -110,7 +112,30 @@ companyApp.controller('AdminCoursesCtrl', function($rootScope, $scope, $routePar
 		course.state = "normal";
 		$scope.course = course;
 		console.log('[END] addNewCourseSubmit() ');	
-	}		
+	}
+	$scope.viewAllCourses = function(course) {
+		$scope.viewCode = "maintainCourses";
+		course.state = "normal";
+	}
+	$scope.editCourse = function(course) {
+		$scope.viewCode = "viewCourse";
+		course.state = "edit";
+		$scope.courseStatuses = CoursesService.getCourseStatuses();
+	}
+	$scope.cancelEdit = function(course) {
+		$scope.viewCode = "viewCourse";
+		course.state = "normal";
+		$scope.course = course;
+	}	
+	$scope.saveCourse = function(editCourse) {
+		console.log('[START] saveCourse(code='+editCourse.code+'::type_code='+editCourse.type_code+'::startdate='+editCourse.startdate+'::location='+editCourse.location+'::status='+editCourse.status);		
+		CoursesService.editCourse(editCourse);
+		$scope.viewCode = "viewCourse";
+		editCourse.state = "normal";
+		$scope.course = editCourse;
+		console.log('[END] saveCourse() ');			
+	}	
+	
 	console.log('[END] AdminCoursesCtrl');
 });
 	
@@ -543,7 +568,21 @@ companyApp.factory('CoursesService', [function(){
 			console.log('[DEBUG] AFTER courses.length='+courses.length);
 			console.log('[END] addNewCourse()');
 			return 'success';	
-		 }	 
+		 },
+		 editCourse : function(editCourse) {
+			console.log('[START] editCourse(code='+editCourse.code+'::type_code='+editCourse.type_code+'::startdate='+editCourse.startdate+'::location='+editCourse.location+'::status='+editCourse.status+'); ');
+			for(var index = 0; index<courses.length; index++)	{	
+				if (courses[index].code == editCourse.code) 
+				{	
+					console.log('[DEBUG] Code match found, updating Course details'); 			
+					courses[index].startdate = editCourse.startdate;
+					courses[index].location = editCourse.location;
+					courses[index].status = editCourse.status;
+				}				
+			}	
+			console.log('[END] editCourse()');
+			return 'success';	
+		 }		 	 
 	}
 	return api
 }])

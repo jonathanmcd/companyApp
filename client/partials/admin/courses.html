@@ -33,23 +33,55 @@
 
 			<span ng-show="viewCode == 'viewCourse'">
 				<h1>Maintain Course - state = {{course.state}}</h1>
+				<p><input type="button" class="btn btn-success" ng-click="viewAllCourses(course)" value="Return to Maintain All Courses"/></p>				
 				<h2>{{course.name.toUpperCase()}} ({{course.code}})</h2>
-				<table class="table table-bordered table-striped"> 
-					<thead>
-					  <tr>
-						<td>Location</td>
-						<td>Start Date</td>							
-						<td>Status</td>							
-						<td></td>
-						<td></td>				
-					  </tr>
-					</thead>
-					<tbody>	
-						<div ng-switch="course.state">
-							<div ng-switch-when="edit">
-								<h1>EDit</h1>
-							</div>	
-							<div ng-switch-when="normal">												
+				<div ng-switch="course.state">
+					<div ng-switch-when="edit">
+						<h1>EDit</h1>
+						<table class="table table-bordered table-striped"> 
+							<thead>
+							  <tr>
+								<td>Location</td>
+								<td>Start Date</td>							
+								<td>Status</td>							
+								<td></td>
+								<td></td>				
+							  </tr>
+							</thead>
+							<tbody>	
+								<tr>
+									<td>
+									    <input type="text" class="form-control" ng-model="course.location" />
+									</td>							
+									<td><input type="date" class="form-control" ng-model="course.startdate" /></td>
+									<!-- <td><input type="text" class="form-control" ng-model="course.status" /></td> -->
+									<td>
+										<select class="form-control" ng-model="course.status" id="status">
+											<option ng-init="course.status==course.status"  ng-repeat="courseStatus in courseStatuses" title="{{courseStatus.code}}"  value="{{courseStatus.code}}">{{courseStatus.code}} - {{courseStatus.desc}}</option>
+										</select>	
+									</td>
+									<td>
+										<input type="button" class="btn btn-success" ng-click="saveCourse(course)" value="Save" />
+									</td>
+									<td>
+										<input type="button" class="btn btn-danger" ng-click="cancelEdit(course)" value="Cancel"/>
+									</td>
+								</tr>
+							</tbody>
+						</table>						
+					</div>	
+					<div ng-switch-when="normal">
+						<table class="table table-bordered table-striped"> 
+							<thead>
+							  <tr>
+								<td>Location</td>
+								<td>Start Date</td>							
+								<td>Status</td>							
+								<td></td>
+								<td></td>				
+							  </tr>
+							</thead>
+							<tbody>	
 								<tr>
 									<td>{{course.location}}</td>							
 									<td>{{course.startdate}}</td>
@@ -61,9 +93,22 @@
 										<input type="button" class="btn btn-danger" ng-click="deleteCourse(course)" value="Delete"/>
 									</td>
 								</tr>
-							</div>
-							<div ng-switch-when="deleted">
-								<tr class="danger">
+							</tbody>
+						</table>										
+					</div>
+					<div ng-switch-when="deleted">
+						<table class="table table-bordered table-striped"> 
+							<thead>
+							  <tr>
+								<td>Location</td>
+								<td>Start Date</td>							
+								<td>Status</td>							
+								<td></td>
+								<td></td>				
+							  </tr>
+							</thead>
+							<tbody>	
+								<tr>
 									<td>{{course.location}}</td>							
 									<td>{{course.startdate}}</td>
 									<td>{{course.status.toUpperCase()}}</td>					  			  
@@ -74,10 +119,10 @@
 										<input type="button" class="btn btn-success" ng-click="deleteCourseUndo(course)" value="Undo"/>
 									</td>
 								</tr>
-							</div>	
-						</div>						
-					</tbody>
-				</table>
+							</tbody>
+						</table>							
+					</div>
+				</div>
 			</span>			
 			
 

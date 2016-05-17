@@ -80,11 +80,11 @@ companyApp.controller('AdminCoursesCtrl', function($rootScope, $scope, $routePar
 	$scope.sortType = 'startdate'; // set the default sort type 
 	$scope.sortReverse = false; // set the default sort order
 	$scope.searchCourse = ''; // set the default search/filter term	
-	$scope.viewCode = "maintainCourses";
+	$scope.viewCourseCode = "allCourses";
 
 	
 	$scope.deleteCourse = function(course) {
-		course.state = "deleted";
+		course.state = "delete";
 	}	
 	$scope.deleteCourseUndo = function(course) {
 		course.state = "normal";
@@ -93,49 +93,117 @@ companyApp.controller('AdminCoursesCtrl', function($rootScope, $scope, $routePar
 		console.log('[START] deleteCourseConfirm('+course.code+') ');
 		console.log('[DEBUG] Deleting at persistence level');		
 		$scope.courses = CoursesService.deleteByCode(course.code);
-		$scope.viewCode = "maintainCourses";
+		$scope.viewCourseCode = "allCourses";
 	}	
-	$scope.addNewCourseView = function() {
-		$scope.viewCode = "addNewCourseForm";
+	$scope.addCourse = function() {
+		$scope.viewCourseCode = "addNewCourse";
 		$scope.courseTypes = CoursesService.getCourseTypesAll();
 		$scope.courseStatuses = CoursesService.getCourseStatuses();
 	}
 	$scope.addNewCourseSubmit = function() {
 		console.log('[START] addNewCourseSubmit(type_code='+$scope.newCourse.type_code+'::startdate='+$scope.newCourse.startdate+'::location='+$scope.newCourse.location+'::status='+$scope.newCourse.status);
 		$scope.addNewCourseStatus = CoursesService.addNewCourse($scope.newCourse);
-		$scope.viewCode = "maintainCourses";
+		$scope.viewCourseCode = "allCourses";
 		console.log('[END] addNewCourseSubmit()');		
 	}
 	$scope.viewCourse = function(course) {
-		console.log('[START] addNewCourseSubmit(type_code='+course.type_code+') ');	
-		$scope.viewCode = "viewCourse";
+		console.log('[START] viewCourse(type_code='+course.type_code+') ');	
+		$scope.viewCourseCode = "viewCourse";
 		course.state = "normal";
 		$scope.course = course;
-		console.log('[END] addNewCourseSubmit() ');	
+		$scope.sortType = 'id'; // set the default sort type 
+		$scope.sortReverse = false; // set the default sort order
+		$scope.searchCourse = ''; // set the default search/filter term		
+		console.log('[END] viewCourse() ');	
 	}
 	$scope.viewAllCourses = function(course) {
-		$scope.viewCode = "maintainCourses";
+		$scope.viewCourseCode = "allCourses";
 		course.state = "normal";
 	}
 	$scope.editCourse = function(course) {
-		$scope.viewCode = "viewCourse";
+		$scope.viewCourseCode = "viewCourse";
 		course.state = "edit";
+		course.oldStartdate = course.startdate;
+		course.oldLocation = course.location;
+		course.oldStatus = course.status;
 		$scope.courseStatuses = CoursesService.getCourseStatuses();
 	}
 	$scope.cancelEdit = function(course) {
-		$scope.viewCode = "viewCourse";
+		$scope.viewCourseCode = "viewCourse";
 		course.state = "normal";
-		$scope.course = course;
-	}	
+		course.startdate = course.oldStartdate;
+		course.location = course.oldLocation;
+		course.status = course.oldStatus;
+	}
 	$scope.saveCourse = function(editCourse) {
 		console.log('[START] saveCourse(code='+editCourse.code+'::type_code='+editCourse.type_code+'::startdate='+editCourse.startdate+'::location='+editCourse.location+'::status='+editCourse.status);		
 		CoursesService.editCourse(editCourse);
-		$scope.viewCode = "viewCourse";
+		$scope.viewCourseCode = "viewCourse";
 		editCourse.state = "normal";
 		$scope.course = editCourse;
 		console.log('[END] saveCourse() ');			
+	}
+	// ############## STUDENT RELATED FUNCTIONS #######################	
+	$scope.addStudent = function() {
+		$scope.viewCourseCode = "viewCourse";		
+		$scope.viewStudentCode = "addNewStudent";
+		$scope.studentStatuses = CoursesService.getStudentStatuses();
+		console.log('[DEBUG] addStudent() - $scope.studentStatuses.length=' + $scope.studentStatuses.length);
 	}	
-	
+	$scope.cancelAddStudent = function() {
+		$scope.viewCourseCode = "viewCourse";		
+		$scope.viewStudentCode = "";
+	}
+	$scope.deleteStudent = function(student) {
+		student.state = "delete";
+	}
+	$scope.deleteStudentUndo = function(student) {	
+		student.state = "normal";
+	}	
+	$scope.deleteStudentConfirm = function(course,student) {
+		console.log('[START] deleteStudentConfirm(courseCode='+course.code+'::student_id='+student.id+') ');
+		student.state = "normal";
+		console.log('[DEBUG] Deleting at persistence level');		
+		$scope.courses = CoursesService.deleteStudent(course,student);
+		$scope.viewCourseCode = "viewCourse";
+	}	
+	$scope.addNewStudentSubmit = function() {
+		$scope.newStudent.code = $scope.course.code;
+		console.log('[START] addNewStudentSubmit(newStudent.code='+$scope.newStudent.code
+		+'\n::$scope.newBooking.name='+$scope.newStudent.name+'::$scope.newBooking.email='+$scope.newStudent.email
+		+'\n::$scope.newBooking.phone='+$scope.newStudent.phone+'::$scope.newBooking.address='+$scope.newStudent.address);		
+		$scope.addBookingStatus = CoursesService.addNewStudent($scope.newStudent);
+		$scope.viewCourseCode = "viewCourse";		
+		$scope.viewStudentCode = "";
+		$scope.newStudent = "";
+		console.log('[END] addNewStudentSubmit()');		
+	}
+	$scope.editStudent = function(student) {
+		console.log('[START] editStudent() ');		
+		student.oldName = student.name;
+		student.oldEmail = student.email;
+		student.oldAddress = student.address;
+		student.oldPhoneNumber = student.phone_number;
+		student.oldStatus = student.status;
+		student.state = "edit";
+		console.log('[END] editStudent() ');			
+	}	
+	$scope.saveEditStudent = function(course,student) {
+		console.log('[START] saveEditStudent() ');			
+		student.state = "normal";
+		$scope.courses = CoursesService.editStudent(course,student);
+		console.log('[END] saveEditStudent() ');			
+	}
+	$scope.cancelEditStudent = function(student) {
+		console.log('[START] cancelEditStudent() ');	
+		student.name = student.oldName;
+		student.email = student.oldEmail;
+		student.address = student.oldAddress;
+		student.phone_number = student.oldPhoneNumber;
+		student.status = student.oldStatus;
+		student.state = "normal";
+		console.log('[END] cancelEditStudent() ');	
+	}	
 	console.log('[END] AdminCoursesCtrl');
 });
 	
@@ -152,10 +220,17 @@ companyApp.controller('AboutCtrl', function($rootScope, $scope) {
 });	
 
 companyApp.controller('ContactCtrl', function($rootScope, $scope) {
-	console.log('[START] ContactCtrl');
+	console.log('[START] ContactCtrl()');
 	$rootScope.pageTitle = "Contact Us";
+	$scope.submitContactStatus ='';
+	$scope.contactSubmit = function() {
+		console.log('[START] contactSubmit(name='+$scope.contact.name+'::email='+$scope.contact.email+'::phone='+$scope.contact.phone+'::comment='+$scope.contact.comment+') ');			
+		// TO DO hook up to mailgun and Send email
+		$scope.submitContactStatus = 'success';
+		console.log('[END] contactSubmit() ');			
+	}
 	console.log('[END] ContactCtrl');
-});		
+});	
 
 companyApp.controller('BookingCtrl', function($rootScope, $scope, $routeParams, CoursesService) {
 	console.log('[START] BookingCtrl');	
@@ -187,7 +262,7 @@ companyApp.controller('BookingCtrl', function($rootScope, $scope, $routeParams, 
 	$scope.addBooking = function() {
 		console.log('[DEBUG] $scope.newBooking.code='+$scope.newBooking.code+'::newBooking.type_code='+$scope.newBooking.type_code
 		+'\n::$scope.newBooking.name='+$scope.newBooking.name+'::$scope.newBooking.email='+$scope.newBooking.email
-		+'\n::$scope.newBooking.phone='+$scope.newBooking.phone+'::$scope.newBooking.address1='+$scope.newBooking.address1);		
+		+'\n::$scope.newBooking.phone='+$scope.newBooking.phone+'::$scope.newBooking.address='+$scope.newBooking.address);		
 		$scope.addBookingStatus = CoursesService.addNewStudent($scope.newBooking);
 	}	
 	console.log('[END] BookingCtrl');	
@@ -304,19 +379,64 @@ companyApp.factory('CoursesService', [function(){
 		this.max_of_students = max_of_students_in;
 		this.location = location_in;
 		this.status = status_in; //'draft'; // Other status's are open, closed, onhold
-		this.students = [ ];	
-		this.addStudent = function(p_id, p_name, p_email, p_phone, p_address) {
-				var student = {id :p_id, name : p_name, email : p_email, phone : p_phone, address : p_address, guid : generateUUID()};
+		this.students = [ ];
+
+		this.addStudent = function(p_name, p_email, p_phone, p_address) {
+				console.log('[START] Course.addStudent(p_name='+p_name+'::p_email='+p_email+'::p_phone='+p_phone+'::p_phone='+p_address); 
+				// Determine new student id - get max student id and add 1
+				var maxStudentId = 0;
+				console.log('[DEBUG] - maxStudentId='+maxStudentId); 
+
+				for (var index = 0 ; index < this.students.length ; index += 1) {
+					console.log('[DEBUG] - students['+index+'].id='+this.students[index].id); 
+					if (this.students[index].id > maxStudentId) 
+					{					
+						maxStudentId = this.students[index].id;
+						console.log('[DEBUG] - NEW maxStudentId='+maxStudentId); 
+					}					
+				}
+				var newStudentId = maxStudentId + 1;
+				console.log('[DEBUG] newStudentId='+newStudentId); 
+				// create student object
+				var student = {id :newStudentId, name : p_name, email : p_email, phone : p_phone, address : p_address};
 				if(this.students.length < this.max_of_students)
 					student.status = 'enrolled'
 				else
 				{
 					student.status = 'waiting'
 				}
+				// Add student object to students array
 				this.students.push(student);
+				console.log('[END] Course.addStudent()');
 		}
-		//this.deleteStudent
-		//this.editStudent
+		this.deleteStudent = function(p_id) {
+			console.log('[DEBUG] Course.deleteStudent(p_id='+p_id+')'); 
+			for (var index = 0 ; index < this.students.length ; index += 1) {
+				if (this.students[index].id == p_id) 
+				{					
+					this.students.splice(index, 1);			
+				}					
+			}
+		}		
+		this.editStudent = function(p_student) {
+			console.log('[DEBUG] Course.editStudent(student.id='+p_student.id+'::students.length='+this.students.length+')'); 
+			for(var index = 0; index<this.students.length; index++)	{
+				console.log('[DEBUG] students['+index+'].code=' + this.students[index].id);
+				if (this.students[index].id == p_student.id) 
+				{
+					console.log('[DEBUG] Updating ' +p_student.name+ ' (id='+this.students[index].id+')');
+					this.students[index].name = p_student.name;
+					this.students[index].email = p_student.email;
+					this.students[index].phone = p_student.phone;
+					this.students[index].address = p_student.address;
+					this.students[index].status = p_student.status;
+				}
+			}				
+			//this.deleteStudent(student.id);
+			//console.log('[DEBUG] After deleting a student - students.length='+this.students.length); 
+			//this.addStudent(student.name, student.email, student.phone, student.address);
+			//console.log('[DEBUG] After adding a student - students.length='+this.students.length); 
+		}
 		this.displayInfo = function () {
 			return 'CourseCode=' + this.code + '::CourseName='+this.name+'::StartDate='+this.startdate+'::MaxNumStudents='+this.max_of_students;
 		}
@@ -326,82 +446,66 @@ companyApp.factory('CoursesService', [function(){
 				studentsString = studentsString + 'id=' + this.students[i].id + '::status=' + this.students[i].status+ '::name=' + this.students[i].name
 				+ '::email=' + this.students[i].email+ '::phone=' + this.students[i].phone
 				+ '::address=' + this.students[i].address
-				//+ '::guid=' + this.students[i].guid
 				+ '\n';
 			}	
 			return studentsString;
 		}
 	}
 	
-	function generateUUID(){
-		var d = new Date().getTime();
-		if(window.performance && typeof window.performance.now === "function"){
-			d += performance.now(); //use high-precision timer if available
-		}
-		var uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
-			var r = (d + Math.random()*16)%16 | 0;
-			d = Math.floor(d/16);
-			return (c=='x' ? r : (r&0x3|0x8)).toString(16);
-		});
-		return uuid;
-	}
 	
 	var courses = [ ];	
 	var course1 = new Course('OFA-1','OFA','OCCUPATIONAL FIRST AID','2016-05-13',4,'Waterford City','open')
-	course1.addStudent(1, 'Jonathan McDonald','jon@home.ie','0872223345','13 Jump St, Cork Rd, Waterford')
-	course1.addStudent(2, 'Joe Soap','soap@test.ie','00511122323','17 Leap St, Limerick Rd, Waterford')
-	course1.addStudent(3, 'Gemma Smith','gemma@dublin.ie','017438349','16 Posh St, St Stephens Green, Dublin 2')
-	course1.addStudent(4, 'Graham Little','little@iol.ie','051426172','1 Lower Road, Waterford')
-	course1.addStudent(5, 'Guys Bigglesworth','guys@ireland.ie','0882345768','15 Groover Ave, Kilkenny')
+	course1.addStudent('Jonathan McDonald','jon@home.ie','0872223345','13 Jump St, Cork Rd, Waterford')
+	course1.addStudent('Joe Soap','soap@test.ie','00511122323','17 Leap St, Limerick Rd, Waterford')
+	course1.addStudent('Gemma Smith','gemma@dublin.ie','017438349','16 Posh St, St Stephens Green, Dublin 2')
+	course1.addStudent('Graham Little','little@iol.ie','051426172','1 Lower Road, Waterford')
+	course1.addStudent('Guys Bigglesworth','guys@ireland.ie','0882345768','15 Groover Ave, Kilkenny')
 	courses.push(course1);
 
 	var course2 = new Course('CFR-1','CFR','Cardiac First Responder','2014-05-17',3,'Kilkenny City','closed')
-	course2.addStudent(1, 'Jenny Smith','jen@home.ie','087443423','26 Jump St, Cork Rd, Waterford')
-	course2.addStudent(2, 'John Quinn','quinn@home.ie','00511122323','27 Leap St, Limerick Rd, Waterford')
-	course2.addStudent(3, 'Tommy Murphy','tommy@dublin.ie','013245452','27 Posh St, St Stephens Green, Dublin 2')
-	course2.addStudent(4, 'Graham Little','little@iol.ie','051426172','2 Lower Road, Waterford')
-	course2.addStudent(5, 'Jane Doyle','jane@doyle.ie','0882345768','25 Groover Ave, Cork')
+	course2.addStudent('Jenny Smith','jen@home.ie','087443423','26 Jump St, Cork Rd, Waterford')
+	course2.addStudent('John Quinn','quinn@home.ie','00511122323','27 Leap St, Limerick Rd, Waterford')
+	course2.addStudent('Tommy Murphy','tommy@dublin.ie','013245452','27 Posh St, St Stephens Green, Dublin 2')
+	course2.addStudent('Graham Little','little@iol.ie','051426172','2 Lower Road, Waterford')
+	course2.addStudent('Jane Doyle','jane@doyle.ie','0882345768','25 Groover Ave, Cork')
 	courses.push(course2);
 
 	var course3 = new Course('OFA-2','OFA','OCCUPATIONAL FIRST AID','2016-05-30',3,'Kilkenny City','closed')
-	course3.addStudent(1, 'Mandy Jones','mandy@waterford.ie','0872223345','37 Jump St, Cork Rd, Waterford')
-	course3.addStudent(2, 'Jason Smith','smithy@test.ie','08512132342','31 Leap St, Limerick Rd, Waterford')
-	course3.addStudent(3, 'Gemma Powell','gemma@dublin.ie','017438349','388 Posh St, St Stephens Green, Dublin 2')
-	course3.addStudent(4, 'Annette Kelly','kelly@iol.ie','021627932','3 Lower Road, Waterford')
-	course3.addStudent(5, 'Shay Forristal','shay@se2.ie','061376483','35 Groover Ave, Kilkenny')
-	course3.addStudent(6, 'Jimmy Allen','jimmy@test.ie','0612312312','39 Misery Lane, Wexford')	
+	course3.addStudent('Mandy Jones','mandy@waterford.ie','0872223345','37 Jump St, Cork Rd, Waterford')
+	course3.addStudent('Jason Smith','smithy@test.ie','08512132342','31 Leap St, Limerick Rd, Waterford')
+	course3.addStudent('Gemma Powell','gemma@dublin.ie','017438349','388 Posh St, St Stephens Green, Dublin 2')
+	course3.addStudent('Annette Kelly','kelly@iol.ie','021627932','3 Lower Road, Waterford')
+	course3.addStudent('Shay Forristal','shay@se2.ie','061376483','35 Groover Ave, Kilkenny')
+	course3.addStudent('Jimmy Allen','jimmy@test.ie','0612312312','39 Misery Lane, Wexford')	
 	courses.push(course3);
 
 	var course4 = new Course('OFA-3','OFA','OCCUPATIONAL FIRST AID','2016-06-14',4,'Waterford City','open')
-	course4.addStudent(1, 'Timmy Mallet','timmy@waterford.ie','0872223345','47 Jump St, Cork Rd, Waterford')
-	course4.addStudent(2, 'Jason Smith','smithy@test.ie','08512132342','49 Leap St, Limerick Rd, Waterford')
-	course4.addStudent(3, 'Gemma Powell','gemma@dublin.ie','017438349','423 Posh St, St Stephens Green, Dublin 2')
-	course4.addStudent(4, 'Annette Kelly','kelly@iol.ie','021627932','4 Lower Road, Waterford')
-	course4.addStudent(5, 'Shay Forristal','shay@se2.ie','061376483','45 Groover Ave, Kilkenny')
+	course4.addStudent('Timmy Mallet','timmy@waterford.ie','0872223345','47 Jump St, Cork Rd, Waterford')
+	course4.addStudent('Jason Smith','smithy@test.ie','08512132342','49 Leap St, Limerick Rd, Waterford')
+	course4.addStudent('Gemma Powell','gemma@dublin.ie','017438349','423 Posh St, St Stephens Green, Dublin 2')
+	course4.addStudent('Annette Kelly','kelly@iol.ie','021627932','4 Lower Road, Waterford')
+	course4.addStudent('Shay Forristal','shay@se2.ie','061376483','45 Groover Ave, Kilkenny')
 	courses.push(course4);
 
 	var course5 = new Course('CFR-2','CFR','Cardiac First Responder','2016-06-01',4,'Waterford City','draft')
-	course5.addStudent(1, 'Seamus Grant','seamus@home.ie','0872223345','15 Lower Glanmire Rd, Cork')
-	course5.addStudent(2, 'Brian Linton','brian@test.ie','0051213213','25 Leap St, Limerick Rd, Waterford')
-	course5.addStudent(3, 'Lisa Morris','lisa@dublin.ie','017438349','5 Posh St, St Stephens Green, Dublin 2')
+	course5.addStudent('Seamus Grant','seamus@home.ie','0872223345','15 Lower Glanmire Rd, Cork')
+	course5.addStudent('Brian Linton','brian@test.ie','0051213213','25 Leap St, Limerick Rd, Waterford')
+	course5.addStudent('Lisa Morris','lisa@dublin.ie','017438349','5 Posh St, St Stephens Green, Dublin 2')
 	courses.push(course5);	
 	
 	var course6 = new Course('OFAR-1','OFAR','OCCUPATIONAL FIRST AID REFRESHER','2017-01-17',4,'Limerick City','open')
-	course4.addStudent(1, 'Peter Mullet','peter@mullet.ie','0872223345','67 Jump St, Cork Rd, Limerick')
-	course4.addStudent(2, 'Gavin Smith','smithy@test.ie','08512132342','6 Leap St, Limerick Rd, Limerick')
-	course4.addStudent(3, 'Mark Owens','Mark@limerick.ie','017438349','690 Posh St, Lower Drive Rd, Limerick')
 	courses.push(course6);	
 	
 	var course7 = new Course('OFAR-2','OFAR','OCCUPATIONAL FIRST AID REFRESHER','2018-06-14',4,'Waterford City','draft')
-	course7.addStudent(1, 'Timmy Mallet','timmy@waterford.ie','0872223345','47 Jump St, Cork Rd, Waterford')
-	course7.addStudent(2, 'Jason Smith','smithy@test.ie','08512132342','49 Leap St, Limerick Rd, Waterford')
-	course7.addStudent(3, 'Gemma Powell','gemma@dublin.ie','017438349','423 Posh St, St Stephens Green, Dublin 2')
+	course7.addStudent('Timmy Mallet','timmy@waterford.ie','0872223345','47 Jump St, Cork Rd, Waterford')
+	course7.addStudent('Jason Smith','smithy@test.ie','08512132342','49 Leap St, Limerick Rd, Waterford')
+	course7.addStudent('Gemma Powell','gemma@dublin.ie','017438349','423 Posh St, St Stephens Green, Dublin 2')
 	courses.push(course7);	
 
 	var course8 = new Course('CFR-3','CFR','Cardiac First Responder','2016-12-23',4,'Waterford City','open')
-	course8.addStudent(1, 'Liam Alyward','seamus@home.ie','0872223345','15 Lower Glanmire Rd, Cork')
-	course8.addStudent(2, '','brian@test.ie','0051213213','25 Leap St, Limerick Rd, Waterford')
-	course8.addStudent(3, '','lisa@dublin.ie','017438349','5 Posh St, St Stephens Green, Dublin 2')
+	course8.addStudent('Liam Alyward','seamus@home.ie','0872223345','15 Lower Glanmire Rd, Cork')
+	course8.addStudent('Dudley Moore','brian@test.ie','0051213213','25 Leap St, Limerick Rd, Waterford')
+	course8.addStudent('Lisa Doyle','lisa@dublin.ie','017438349','5 Posh St, St Stephens Green, Dublin 2')
 	courses.push(course8);	
 	
 	// Populate the type of Courses 
@@ -421,8 +525,20 @@ companyApp.factory('CoursesService', [function(){
 	courseStatuses.push(courseStatus);		
 	var courseStatus = {code :'OPEN', desc : 'Open for public enrollment'};	
 	courseStatuses.push(courseStatus);	
-	var courseStatus = {code :'CLOSED', desc : 'Closed/finished no longer open for public enrollment'};	
+	var courseStatus = {code :'CLOSED', desc : 'No longer open for public enrollment'};	
 	courseStatuses.push(courseStatus);	
+
+	// Populate the different types of Student statuses
+	var studentStatuses = [ ];		
+	var studentStatus = {code :'ENROLLED', desc : 'Student has enrolled in the course.'};	
+	studentStatuses.push(studentStatus);		
+	var courseStatus = {code :'PAID', desc : 'Student has paid fee.'};	
+	studentStatuses.push(studentStatus);	
+	var courseStatus = {code :'WAITING', desc : 'Waiting list - Course is full.'};	
+	studentStatuses.push(studentStatus);	
+	var courseStatus = {code :'CANCELLED', desc : 'Student has cancelled booking.'};	
+	studentStatuses.push(studentStatus);	
+
 
 	
 	
@@ -536,28 +652,55 @@ companyApp.factory('CoursesService', [function(){
 		 getCourseStatuses : function() {
 			console.log('[INSIDE] getCourseStatuses');		
 			return courseStatuses;		
-		 },				 
+		 },	
+		 getStudentStatuses : function() {	
+			return studentStatuses;		
+		 },	
 		 addNewStudent : function(newBooking) {
-			console.log('[START] addNewStudent(code='+newBooking.code+'::type_code='+newBooking.type_code
+			console.log('[START] addNewStudent(code='+newBooking.code  //+'::type_code='+newBooking.type_code
 			+'\n::name='+newBooking.name+'::email='+newBooking.email
-			+'\n::phone='+newBooking.phone+'::address1='+newBooking.address1+') ');
+			+'\n::phone='+newBooking.phone+'::address='+newBooking.address+') ');
 			for(var index = 0; index<courses.length; index++)	{
 				console.log('[DEBUG] courses['+index+'].code=' + courses[index].code);
 				if (courses[index].code == newBooking.code) 
 				{		
 
-					console.log('[DEBUG] courses[index].students.length=' + courses[index].students.length); 
-					var newStudentId = courses[index].students.length + 1;
-					console.log('[DEBUG] newStudentId=' + newStudentId); 					
+					console.log('[DEBUG] courses[index].students.length=' + courses[index].students.length); 				
 					console.log('[DEBUG] BEFORE ' + courses[index].displayInfo());
 					console.log('[DEBUG] BEFORE ' + courses[index].displayStudents());
-					courses[index].addStudent(newStudentId, newBooking.name, newBooking.email, newBooking.phone, newBooking.address1);					
+					courses[index].addStudent(newBooking.name, newBooking.email, newBooking.phone, newBooking.address);					
 					console.log('[DEBUG] AFTER ' + courses[index].displayInfo());
 					console.log('[DEBUG] AFTER ' + courses[index].displayStudents());	
 				}				
 			}		
 			console.log('[END] addNewStudent()');
 			return 'success';	
+		 },
+		 deleteStudent : function(course,student) {
+			console.log('[START] deleteStudent(code='+course.code+'::student.id='+student.id+') ');
+			for(var index = 0; index<courses.length; index++)	{
+				console.log('[DEBUG] courses['+index+'].code=' + courses[index].code);
+				if (courses[index].code == course.code) 
+				{
+					console.log('[DEBUG] Deleting ' +student.name+ ' (id='+student.id+') from course=' + courses[index].code);
+					courses[index].deleteStudent(student.id);
+				}
+			}
+			console.log('[END] deleteStudent()');				 	
+			return courses;
+		 },
+		 editStudent : function(course,student) {
+			console.log('[START] editStudent(code='+course.code+'::student.id='+student.id+') ');
+			for(var index = 0; index<courses.length; index++)	{
+				console.log('[DEBUG] courses['+index+'].code=' + courses[index].code);
+				if (courses[index].code == course.code) 
+				{
+					console.log('[DEBUG] Updating ' +student.name+ ' (id='+student.id+') from course=' + courses[index].code);
+					courses[index].editStudent(student);
+				}
+			}	
+			console.log('[END] editStudent()');			 	
+			return courses;
 		 },
 		 addNewCourse : function(newCourse) {
 			console.log('[START] addNewCourse(type_code='+newCourse.type_code+'::startdate='+newCourse.startdate+'::location='+newCourse.location+'::status='+newCourse.status+'); ');

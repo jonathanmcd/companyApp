@@ -1,27 +1,37 @@
 <!DOCTYPE html>
-<html lang="en" ng-app="companyApp" > 
+<html lang="en" ng-app="companyApp" >
 	<head>
 		<title ng-bind="pageTitle"></title>
 		<meta charset="UTF-8">
 		<link rel="icon" href="img/favicon.ico">
 		<!-- ###### CSS ####### -->
 		<!-- Bootstrap core CSS -->
-		<link rel="stylesheet" href="styles/bootstrap/3.3.6/css/bootstrap.min.css" />	
-		<link rel="stylesheet" href="styles/font-awesome-4.6.2/css/font-awesome.min.css"> <!--  --> 
+		<link rel="stylesheet" href="styles/bootstrap/3.3.6/css/bootstrap.min.css" />
+		<link rel="stylesheet" href="styles/font-awesome-4.6.2/css/font-awesome.min.css"> <!--  -->
 		<!-- Bootstrap theme -->
-		<link href="styles/bootstrap-theme.min.css" rel="stylesheet"/>	
+		<link href="styles/bootstrap-theme.min.css" rel="stylesheet"/>
 		<link type="text/css" rel="stylesheet" href="css/style.css" />
 		<!-- ###### JS ####### -->
 		<!--<script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.2.23/angular.min.js"></script>-->
 		<script type="text/javascript" src="scripts/angular.min.js"></script>
-		<script type="text/javascript" src="scripts/angular-route.min.js"></script>   <!-- NEW Line --> 
+		<script type="text/javascript" src="scripts/angular-route.min.js"></script>   <!-- NEW Line -->
 		<!--<script src="https://cdnjs.cloudflare.com/ajax/libs/angular-filter/0.5.6/angular-filter.js"></script>-->
 		<meta name="viewport" content="width=device-width, initial-scale=1">
 		<!-- This line is necessary to support $location HTML5 mode (for query string parameters). -->
-		<base href="/">		
+		<base href="/">
 		<script src="https://www.google.com/recaptcha/api.js" async defer></script>
+		<script>
+		  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+		  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+		  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+		  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+		  ga('create', 'UA-6595963-9', 'auto');
+		  ga('send', 'pageview');
+
+		</script>
 	</head>
-	<body>  
+	<body>
 		<div ng-view ></div>
 		<footer>
 			<div class="container">
@@ -31,12 +41,12 @@
 					</div>
 				</div>
 			</div>
-		</footer>		        
+		</footer>
     </body>
-    <script src="app/app.js"></script>	
+    <script src="app/app.js"></script>
     <!-- Bootstrap core JavaScript
     ================================================== -->
     <!-- Placed at the end of the document so the pages load faster -->
     <script src="scripts/jquery.min.js"></script>
-    <script src="scripts/bootstrap.min.js"></script>  
+    <script src="scripts/bootstrap.min.js"></script>
 </html>

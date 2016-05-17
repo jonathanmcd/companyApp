@@ -1,7 +1,7 @@
-		<div class="container theme-showcase" role="main">	
+		<div class="container theme-showcase" role="main">
 			<div class="header">
 				<a href="#/admin"><img class="logo" src="img/logo.jpg" alt="First Aid Responder Training Logo" style="width:406px;height:74px;" /></a>
-			</div>	
+			</div>
 			<!-- Navigation -->
 			<nav class="navbar navbar-default" role="navigation">
 				<div class="container">
@@ -31,20 +31,20 @@
 						<li><a href="#/booking">Booking</a></li>
 						<li class="active"><a href="#">Contact</a></li>
 					  </ul>
-					</div> 
+					</div>
 				</div>
 			</nav>
-			
+
 			<h1>Contact Us</h1>
 
-			<span ng-show="submitContactStatus == ''">			
+			<span ng-show="submitContactStatus == ''">
 				<p>Please fill in the following form, and a member of staff will reply to you: </p>
-				
-				<form name="postFormContact" ng-submit="contactSubmit()">	
+
+				<form name="postFormContact" ng-submit="contactSubmit()">
 				  <div class="form-group">
 					<label for="name">Name:</label>
 					<input type="text" ng-model="contact.name" class="form-control" id="name" placeholder="Enter your name here." required>
-				  </div>			
+				  </div>
 				  <div class="form-group">
 					<label for="email">Email address:</label>
 					<input type="email" ng-model="contact.email" class="form-control" id="email" placeholder="Enter email address here." required>
@@ -52,7 +52,7 @@
 				  <div class="form-group">
 					<label for="phone">Phone:</label>
 					<input type="tel" ng-model="contact.phone" class="form-control" id="phone" placeholder="Enter phone number here." required>
-				  </div>			  
+				  </div>
 				  <div class="form-group">
 					<label for="comment">Comment:</label>
 					<textarea class="form-control" ng-model="contact.comment" rows="5" id="comment" placeholder="Enter your message here." required></textarea>
@@ -60,15 +60,19 @@
 				  <div class="g-recaptcha" data-sitekey="6LfQJiATAAAAAH2hYaSmIGQyW02oBv_alLNHRD6w"></div>
 				  <button type="submit" class="btn btn-primary" ng-disabled="postFormContact.$pristine || (postFormContact.$dirty && postFormContact.$invalid) ">Submit</button>
 				</form>
-			</span>		
+			</span>
 
 			<span ng-show="submitContactStatus == 'success'">
-			  <div class="alert alert-success">	  
+			  <div class="alert alert-success">
 				<p>Thank you for your query, a member of staff will be in touch with you soon.</p>
-			  </div>							
-			</span>				
+			  </div>
+			</span>
+
+			<br><br>
+			<div id="googleMap" style="width:500px;height:380px;"></div>
+			<br>
 		</div>
-	
+
 
 
 

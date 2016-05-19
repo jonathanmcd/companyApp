@@ -5,10 +5,10 @@ var router = express.Router();
 
 router.get('/', controller.index);
 router.post('/', controller.create);
-router.post('/:code/students', controller.add_student);
-router.put('/:code', controller.update);
-//router.put('/:code/students', controller.update_student);
-router.delete('/:code', controller.destroy);
-//router.delete('/:code/students', controller.delete_student);
+router.post('/:id/students', controller.add_student);
+router.put('/:id', controller.update);
+//router.put('/:id/students', controller.update_student);
+router.delete('/:id', controller.destroy);
+router.delete('/:id/students', controller.delete_student);
 
 module.exports = router;

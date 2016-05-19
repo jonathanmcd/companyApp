@@ -1,27 +1,27 @@
-		<div class="container theme-showcase" role="main">	
+		<div class="container theme-showcase" role="main">
 			<div class="header">
 				<a href="#/"><img class="logo" src="img/logo-admin.jpg" alt="Admin Console" style="width:406px;height:74px;" /></a>
-			</div>	
-	
+			</div>
+
 			<!-- ######## View all courses -  ########## -->
 			<span ng-show="viewCourseCode == 'allCourses'">
-				<h1>Maintain Courses</h1>	
+				<h1>Maintain Courses</h1>
 				  <div class="alert alert-info">
 					<a href="" class="close" data-dismiss="alert" aria-label="close">&times;</a>
 					<p>Sort Type: {{ sortType }}</p>
 					<p>Sort Reverse: {{ sortReverse }}</p>
 					<p>Search Query: {{ searchCourse }}</p>
-				  </div>	  
+				  </div>
 				<form>
 					<div class="form-group">
 					  <div class="input-group">
 						<div class="input-group-addon"><i class="fa fa-search"></i></div>
 						<input type="text" class="form-control" placeholder="Search for a course" ng-model="searchCourse">
-					  </div>      
+					  </div>
 					</div>
 				</form>
 				<p><input type="button" class="btn btn-success" ng-click="addCourse()" value="Add NEW Course" /></p>
-				<table class="table table-bordered table-striped"> 
+				<table class="table table-bordered table-striped">
 					<thead>
 					  <tr>
 						<td>
@@ -60,35 +60,35 @@
 							<span ng-show="sortType == 'students.length' && !sortReverse" class="fa fa-caret-down"></span>
 							<span ng-show="sortType == 'students.length' && sortReverse" class="fa fa-caret-up"></span>
 							Total Bookings</a>
-						</td>					
+						</td>
 						<td></td>
-						<td></td>				
+						<td></td>
 					  </tr>
 					</thead>
-				
+
 					<tbody ng-repeat="course in courses | orderBy:sortType:sortReverse| filter:searchCourse" ng-switch="course.state">
 						<tr class="danger" ng-switch-when="delete">
-						  <td>{{course.startdate}}</td>
+						  <td>{{course.startdate| date:'dd/MM/yyyy'}}</td>
 						  <td>{{course.code}}</td>
 						  <td>{{course.name.toUpperCase()}}</td>
-						  <td>{{course.location}}</td>	
+						  <td>{{course.location}}</td>
 						  <td>{{course.status.toUpperCase()}}</td>
-						  <td>{{course.students.length}}</td>	
+						  <td>{{course.students.length}}</td>
 						  <td>
 							<input type="button" class="btn btn-danger" ng-click="deleteCourseConfirm(course)" value="Confirm" />
 						  </td>
 						  <td>
 							<input type="button" class="btn btn-success" ng-click="deleteCourseUndo(course)" value="Undo"/>
 						  </td>
-						</tr>				
+						</tr>
 						<!-- Normal Mode Template -->
 						<tr ng-switch-default>
-						  <td>{{course.startdate}}</td>
+						  <td>{{course.startdate| date:'dd/MM/yyyy'}}</td>
 						  <td>{{course.code}}</td>
 						  <td>{{course.name.toUpperCase()}}</td>
-						  <td>{{course.location}}</td>	
+						  <td>{{course.location}}</td>
 						  <td>{{course.status.toUpperCase()}}</td>
-						  <td>{{course.students.length}}</td>						  			  
+						  <td>{{course.students.length}}</td>
 						  <td>
 							<input type="button" class="btn btn-primary" ng-click="viewCourse(course)" value="View/Edit" />
 						  </td>
@@ -98,66 +98,66 @@
 					  </tr>
 					</tbody>
 				</table>
-			</span>	
+			</span>
 
 			<!-- ######## Add New Course ########## -->
 			<span ng-show="viewCourseCode == 'addNewCourse'">
-				<h1>Maintain Courses - Add NEW Course</h1>			
+				<h1>Maintain Courses - Add NEW Course</h1>
 				<form name="postForm1" ng-submit="addNewCourseSubmit()">
 					<div class="form-group">
 						<label for="type_code">Course:</label>
 						<select class="form-control" ng-model="newCourse.type_code" id="type_code">
 							<option ng-repeat="courseType in courseTypes"   title="{{courseType.name}}"  value="{{courseType.code}}">{{courseType.name.toUpperCase()}}</option>
-						</select>												
-					</div>				  					
+						</select>
+					</div>
 					<div class="form-group">
 						<label for="startdate">Date:</label>
 						<input type="date" ng-model="newCourse.startdate" class="form-control" id="startdate" name='startdate' placeholder="Enter start date.">
-					</div>	
+					</div>
 					<div class="form-group">
 						<label for="location">Location:</label>
 						<input type="text" ng-model="newCourse.location" class="form-control" id="location" name='location' placeholder="Enter location here." required>
-					</div>					
+					</div>
 					<div class="form-group">
 						<label for="status">Status:</label>
 						<select class="form-control" ng-model="newCourse.status" id="status">
 							<option ng-init="newCourse.status=='DRAFT'"  ng-repeat="courseStatus in courseStatuses" title="{{courseStatus.code}}"  value="{{courseStatus.code}}">{{courseStatus.code}} - {{courseStatus.desc}}</option>
-						</select>								
-					</div>			
-					<button type="submit" class="btn btn-primary" ng-disabled="postForm1.$pristine || (postForm1.$dirty && postForm1.$invalid) ">Submit</button>					
-				</form>		
-			</span>			
+						</select>
+					</div>
+					<button type="submit" class="btn btn-primary" ng-disabled="postForm1.$pristine || (postForm1.$dirty && postForm1.$invalid) ">Submit</button>
+				</form>
+			</span>
 
 
 
 			<!-- ######## View details of 1 course - allow edit and delete functionality. Also allow students add, edit and delete -  ########## -->
 			<span ng-show="viewCourseCode == 'viewCourse'">
 				<p><input type="button" class="btn btn-success" ng-click="viewAllCourses(course)" value="Return to Maintain All Courses"/></p>
-				<!-- <h1>Maintain Course - state = {{course.state}}</h1>	-->		
+				<!-- <h1>Maintain Course - state = {{course.state}}</h1>	-->
 				<h2>{{course.name.toUpperCase()}} ({{course.code}})</h2>
 				<div ng-switch="course.state">
 					<div ng-switch-when="edit">
-						<table class="table table-bordered table-striped"> 
+						<table class="table table-bordered table-striped">
 							<thead>
 							  <tr>
 								<td>Location</td>
-								<td>Start Date</td>							
-								<td>Status</td>							
+								<td>Start Date</td>
+								<td>Status</td>
 								<td></td>
-								<td></td>				
+								<td></td>
 							  </tr>
 							</thead>
-							<tbody>	
+							<tbody>
 								<tr>
 									<td>
 									    <input type="text" class="form-control" ng-model="course.location" />
-									</td>							
+									</td>
 									<td><input type="date" class="form-control" ng-model="course.startdate" /></td>
 									<!-- <td><input type="text" class="form-control" ng-model="course.status" /></td> -->
 									<td>
 										<select class="form-control" ng-model="course.status" id="status">
 											<option ng-init="course.status==course.status"  ng-repeat="courseStatus in courseStatuses" title="{{courseStatus.code}}"  value="{{courseStatus.code}}">{{courseStatus.code}} - {{courseStatus.desc}}</option>
-										</select>	
+										</select>
 									</td>
 									<td>
 										<input type="button" class="btn btn-success" ng-click="saveCourse(course)" value="Save" />
@@ -167,24 +167,24 @@
 									</td>
 								</tr>
 							</tbody>
-						</table>						
-					</div>	
+						</table>
+					</div>
 					<div ng-switch-when="normal">
-						<table class="table table-bordered table-striped"> 
+						<table class="table table-bordered table-striped">
 							<thead>
 							  <tr>
 								<td>Location</td>
-								<td>Start Date</td>							
-								<td>Status</td>							
+								<td>Start Date</td>
+								<td>Status</td>
 								<td></td>
-								<td></td>				
+								<td></td>
 							  </tr>
 							</thead>
-							<tbody>	
+							<tbody>
 								<tr>
-									<td>{{course.location}}</td>							
-									<td>{{course.startdate}}</td>
-									<td>{{course.status.toUpperCase()}}</td>					  			  
+									<td>{{course.location}}</td>
+									<td>{{course.startdate| date:'dd/MM/yyyy'}}</td>
+									<td>{{course.status.toUpperCase()}}</td>
 									<td>
 										<input type="button" class="btn btn-primary" ng-click="editCourse(course)" value="Edit" />
 									</td>
@@ -193,24 +193,24 @@
 									</td>
 								</tr>
 							</tbody>
-						</table>										
+						</table>
 					</div>
 					<div ng-switch-when="delete">
-						<table class="table table-bordered table-striped"> 
+						<table class="table table-bordered table-striped">
 							<thead>
 							  <tr>
 								<td>Location</td>
-								<td>Start Date</td>							
-								<td>Status</td>							
+								<td>Start Date</td>
+								<td>Status</td>
 								<td></td>
-								<td></td>				
+								<td></td>
 							  </tr>
 							</thead>
-							<tbody>	
+							<tbody>
 								<tr>
-									<td>{{course.location}}</td>							
-									<td>{{course.startdate}}</td>
-									<td>{{course.status.toUpperCase()}}</td>					  			  
+									<td>{{course.location}}</td>
+									<td>{{course.startdate| date:'dd/MM/yyyy'}}</td>
+									<td>{{course.status.toUpperCase()}}</td>
 									<td>
 										<input type="button" class="btn btn-danger" ng-click="deleteCourseConfirm(course)" value="Confirm" />
 									</td>
@@ -219,37 +219,37 @@
 									</td>
 								</tr>
 							</tbody>
-						</table>							
+						</table>
 					</div>
-				</div>	
+				</div>
 
 				<h2>Students Enrolled</h2>
 				<span ng-show="course.students.length == 0">
-					<div class="alert alert-warning">	  
-						<p>There is currently no students for this course.</p>					
+					<div class="alert alert-warning">
+						<p>There is currently no students for this course.</p>
 				  	</div>
 				  	<span ng-show="viewStudentCode != 'addNewStudent'">
 				  		<p><input type="button" class="btn btn-success" ng-click="addStudent()" value="Add NEW Student" /></p>
 				  	</span>
 				  	<span ng-show="viewStudentCode == 'addNewStudent'">
-						<form name="postFormNewStudent" ng-submit="addNewStudentSubmit()">					  	
-						<table class="table table-bordered table-striped"> 
+						<form name="postFormNewStudent" ng-submit="addNewStudentSubmit()">
+						<table class="table table-bordered table-striped">
 							<thead>
 							  <tr>
 								<td>Name</td>
-								<td>Email</td>									
-								<td>Phone</td>									
-								<td>Address</td>	
-								<td>Status</td>							
+								<td>Email</td>
+								<td>Phone</td>
+								<td>Address</td>
+								<td>Status</td>
 								<td></td>
-								<td></td>				
+								<td></td>
 							  </tr>
 							</thead>
 							<tbody>
 									<tr>
 										<td>
 											<input type="text" ng-model="newStudent.name" class="form-control" id="name" name='name' placeholder="Enter name here." required>
-										</td>							
+										</td>
 										<td>
 											<input type="text" ng-model="newStudent.email" class="form-control" id="email" name='email' placeholder="Enter email here." required>
 										</td>
@@ -259,18 +259,18 @@
 										<td>
 											<input type="text" ng-model="newStudent.address" class="form-control" id="address" name='address' placeholder="Enter address here." required>
 										</td>
-										<td>----</td>					  			  
+										<td>----</td>
 										<td>
 											<button type="submit" class="btn btn-success" ng-disabled="postFormNewStudent.$pristine || (postFormNewStudent.$dirty && postFormNewStudent.$invalid)">Save</button>
 										</td>
 										<td>
 											<input type="button" class="btn btn-danger" ng-click="cancelAddStudent()" value="Cancel"/>
-										</td>									
+										</td>
 									</tr>
 							</tbody>
 						</table>
 						</form>
-					</span>		
+					</span>
 
 				</span>
 
@@ -281,54 +281,54 @@
 						  <div class="input-group">
 							<div class="input-group-addon"><i class="fa fa-search"></i></div>
 							<input type="text" class="form-control" placeholder="Search for a student" ng-model="searchStudent">
-						  </div>      
+						  </div>
 						</div>
-					</form>	
+					</form>
 				  	<span ng-show="viewStudentCode != 'addNewStudent'">
 				  		<p><input type="button" class="btn btn-success" ng-click="addStudent()" value="Add NEW Student" /></p>
-				  	</span>	
-						<form name="postFormNewStudent2" ng-submit="addNewStudentSubmit()">					  							  				
-						<table class="table table-bordered table-striped"> 
+				  	</span>
+						<form name="postFormNewStudent2" ng-submit="addNewStudentSubmit()">
+						<table class="table table-bordered table-striped">
 							<thead>
 							  <tr>
 								<td>
 									<a href="#/admin/courses" ng-click="sortType = 'name'; sortReverse = !sortReverse">
 									<span ng-show="sortType == 'name' && !sortReverse" class="fa fa-caret-down"></span>
 									<span ng-show="sortType == 'name' && sortReverse" class="fa fa-caret-up"></span>
-									Name</a>									
+									Name</a>
 								</td>
 								<td>
 									<a href="#/admin/courses" ng-click="sortType = 'email'; sortReverse = !sortReverse">
 									<span ng-show="sortType == 'email' && !sortReverse" class="fa fa-caret-down"></span>
 									<span ng-show="sortType == 'email' && sortReverse" class="fa fa-caret-up"></span>
-									Email</a>									
-								</td>									
+									Email</a>
+								</td>
 								<td>
 									<a href="#/admin/courses" ng-click="sortType = 'phone'; sortReverse = !sortReverse">
 									<span ng-show="sortType == 'phone' && !sortReverse" class="fa fa-caret-down"></span>
 									<span ng-show="sortType == 'phone' && sortReverse" class="fa fa-caret-up"></span>
-									Phone</a>									
-								</td>									
+									Phone</a>
+								</td>
 								<td>
 									<a href="#/admin/courses" ng-click="sortType = 'address'; sortReverse = !sortReverse">
 									<span ng-show="sortType == 'address' && !sortReverse" class="fa fa-caret-down"></span>
 									<span ng-show="sortType == 'address' && sortReverse" class="fa fa-caret-up"></span>
-									Address</a>									
-								</td>	
+									Address</a>
+								</td>
 								<td>
 									<a href="#/admin/courses" ng-click="sortType = 'status'; sortReverse = !sortReverse">
 									<span ng-show="sortType == 'status' && !sortReverse" class="fa fa-caret-down"></span>
 									<span ng-show="sortType == 'status' && sortReverse" class="fa fa-caret-up"></span>
-									Status</a>									
-								</td>							
+									Status</a>
+								</td>
 								<td></td>
-								<td></td>				
+								<td></td>
 							  </tr>
 							</thead>
 								<tr ng-show="viewStudentCode == 'addNewStudent'">
 									<td>
 										<input type="text" ng-model="newStudent.name" class="form-control" id="name" name='name' placeholder="Enter name here." required>
-									</td>							
+									</td>
 									<td>
 										<input type="text" ng-model="newStudent.email" class="form-control" id="email" name='email' placeholder="Enter email here." required>
 									</td>
@@ -338,14 +338,14 @@
 									<td>
 										<input type="text" ng-model="newStudent.address" class="form-control" id="address" name='address' placeholder="Enter address here." required>
 									</td>
-									<td>----</td>					  			  
+									<td>----</td>
 									<td>
 										<button type="submit" class="btn btn-success" ng-disabled="postFormNewStudent2.$pristine || (postFormNewStudent2.$dirty && postFormNewStudent2.$invalid)">Save</button>
 									</td>
 									<td>
 										<input type="button" class="btn btn-danger" ng-click="cancelAddStudent()" value="Cancel"/>
-									</td>	
-								</tr>						
+									</td>
+								</tr>
 							<tbody ng-repeat="student in course.students | orderBy:sortType:sortReverse| filter:searchStudent"  ng-switch="student.state">
  								<tr ng-switch-when="edit">
 								  	<td>
@@ -362,48 +362,48 @@
 								  	</td>
 								  	<td>
 										<input type="text" class="form-control" ng-model="student.status" />
-								  	</td>	
-								  	<td>				  
+								  	</td>
+								  	<td>
 										<input type="button" class="btn btn-success" ng-click="saveEditStudent(course,student)" value="Save" />
 								  	</td>
 								  	<td>
 										<input type="button" class="btn btn-danger" ng-click="cancelEditStudent(student)" value="Cancel" />
 								  	</td>
-								</tr>							
+								</tr>
 								<tr class="danger" ng-switch-when="delete">
-									<td>{{student.name}}</td>							
+									<td>{{student.name}}</td>
 									<td>{{student.email}}</td>
 									<td>{{student.phone}}</td>
 									<td>{{student.address}}</td>
-									<td>{{student.status.toUpperCase()}}</td>					  			  
+									<td>{{student.status.toUpperCase()}}</td>
 									<td>
 										<input type="button" class="btn btn-danger" ng-click="deleteStudentConfirm(course,student)" value="Confirm" />
 									</td>
 									<td>
 										<input type="button" class="btn btn-success" ng-click="deleteStudentUndo(student)" value="Undo"/>
-									</td>									
-								</tr>				
+									</td>
+								</tr>
 								<!-- Normal Mode Template -->
 								<tr ng-switch-default>
-									<td>{{student.name}}</td>							
+									<td>{{student.name}}</td>
 									<td>{{student.email}}</td>
 									<td>{{student.phone}}</td>
 									<td>{{student.address}}</td>
-									<td>{{student.status.toUpperCase()}}</td>					  			  
+									<td>{{student.status.toUpperCase()}}</td>
 									<td>
 										<input type="button" class="btn btn-primary" ng-click="editStudent(student)" value="Edit" />
 									</td>
 									<td>
 										<input type="button" class="btn btn-danger" ng-click="deleteStudent(student)" value="Delete"/>
-									</td>									
+									</td>
 								</tr>
 							</tbody>
 						</table>
-						</form>		
+						</form>
 				</span>
-			</span>	
+			</span>
 		</div>
-	
+
 
 
 

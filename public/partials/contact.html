@@ -58,7 +58,7 @@
 					<textarea class="form-control" ng-model="contact.comment" rows="5" id="comment" placeholder="Enter your message here." required></textarea>
 				  </div>
 				  <div class="g-recaptcha" data-sitekey="6LfQJiATAAAAAH2hYaSmIGQyW02oBv_alLNHRD6w"></div>
-				  <button type="submit" class="btn btn-primary" ng-disabled="postFormContact.$pristine || (postFormContact.$dirty && postFormContact.$invalid) ">Submit</button>
+				  <button type="submit" class="btn btn-primary" ng-disabled="postFormContact.$pristine || (postFormContact.$dirty && postFormContact.$invalid || grecaptcha.getResponse().length== 0) ">Submit</button>
 				</form>
 			</span>
 
@@ -67,6 +67,16 @@
 				<p>Thank you for your query, a member of staff will be in touch with you soon.</p>
 			  </div>
 			</span>
+
+			<span ng-show="submitContactStatus == 'error'">
+			  <div class="alert alert-alert">
+				<p>You must click on the Captcha box to proceed.</p>
+			  </div>
+			</span>
+
+
+
+
 
 			<br><br>
 			<div id="googleMap" style="width:500px;height:380px;"></div>

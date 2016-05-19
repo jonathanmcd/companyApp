@@ -102,8 +102,8 @@ companyApp.controller('AdminCoursesCtrl', function($rootScope, $scope, $http, $r
 		course.state = "normal";
 	}
 	$scope.deleteCourseConfirm = function(course) {
-		console.log('[START] deleteCourseConfirm('+course.code+') ');
-		CoursesService.deleteCourseByCode(course.code).success(function(status) {
+		console.log('[START] deleteCourseConfirm(course.code='+course.code+'::_id='+course._id+') ');
+		CoursesService.deleteCourseById(course._id).success(function(status) {
 			for(var index = 0; index<$scope.courses.length; index++)
 			{
 				if ($scope.courses[index].code == course.code)
@@ -116,7 +116,7 @@ companyApp.controller('AdminCoursesCtrl', function($rootScope, $scope, $http, $r
 
 	}
 	$scope.saveCourse = function(editCourse) {
-		console.log('[START] saveCourse(code='+editCourse.code+'::type_code='+editCourse.type_code+'::startdate='+editCourse.startdate+'::location='+editCourse.location+'::status='+editCourse.status);
+		console.log('[START] saveCourse(_id='+editCourse._id+'::code='+editCourse.code+'::type_code='+editCourse.type_code+'::startdate='+editCourse.startdate+'::location='+editCourse.location+'::status='+editCourse.status);
 		CoursesService.editCourse(editCourse).success(function(updated_course) {
 			editCourse.state = "normal";
 		});
@@ -191,23 +191,29 @@ companyApp.controller('AdminCoursesCtrl', function($rootScope, $scope, $http, $r
 		console.log('[START] deleteStudentConfirm(courseCode='+course.code+'::student_id='+student.id+') ');
 		student.state = "normal";
 		console.log('[DEBUG] Deleting at persistence level');
-		$scope.courses = CoursesService.deleteStudent(course,student);
+		CoursesService.deleteStudent(course._id, student._id).success(function(status) {
+			for (var index = 0 ; index < course.students.length ; index += 1) {
+				if (course.students[index]._id == student._id)
+				{
+					course.students.splice(index, 1);
+				}
+			}
+		});
+		//$scope.courses = CoursesService.deleteStudent(course,student);
 		$scope.viewCourseCode = "viewCourse";
 	}
 	$scope.addNewStudentSubmit = function() {
 		//$scope.newStudent.code = $scope.course.code;
-		console.log('[START] addNewStudentSubmit v2($scope.course.code='+$scope.course.code
+		console.log('[START] addNewStudentSubmit v3($scope.course._id='+$scope.course._id
 		+'\n::$scope.newBooking.name='+$scope.newStudent.name+'::$scope.newBooking.email='+$scope.newStudent.email
 		+'\n::$scope.newBooking.phone='+$scope.newStudent.phone+'::$scope.newBooking.address='+$scope.newStudent.address);
-		CoursesService.addNewStudent($scope.course.code, $scope.newStudent).success(function(newlyAddedStudent) {
+		CoursesService.addNewStudent($scope.course._id, $scope.newStudent).success(function(newlyAddedStudent) {
 			console.log('[DEBUG] Add new student');
 			$scope.course.students.push(newlyAddedStudent);
 			$scope.newStudent = { };
 		});
-		//$scope.addBookingStatus = CoursesService.addNewStudent($scope.newStudent);
 		$scope.viewCourseCode = "viewCourse";
 		$scope.viewStudentCode = "";
-		//$scope.newStudent = "";
 		console.log('[END] addNewStudentSubmit()');
 	}
     $scope.addComment = function(){
@@ -279,8 +285,9 @@ companyApp.controller('ContactCtrl', function($rootScope, $scope) {
 	$scope.submitContactStatus ='';
 	$scope.contactSubmit = function() {
 		console.log('[START] contactSubmit(name='+$scope.contact.name+'::email='+$scope.contact.email+'::phone='+$scope.contact.phone+'::comment='+$scope.contact.comment+') ');
-		// TO DO hook up to mailgun and Send email
 		$scope.submitContactStatus = 'success';
+		// TO DO hook up to mailgun and Send email
+
 		console.log('[END] contactSubmit() ');
 	}
 	console.log('[END] ContactCtrl');
@@ -539,10 +546,6 @@ companyApp.factory('CoursesService', ['$http', function($http){
 					this.students[index].status = p_student.status;
 				}
 			}
-			//this.deleteStudent(student.id);
-			//console.log('[DEBUG] After deleting a student - students.length='+this.students.length);
-			//this.addStudent(student.name, student.email, student.phone, student.address);
-			//console.log('[DEBUG] After adding a student - students.length='+this.students.length);
 		}
 		this.displayInfo = function () {
 			return 'CourseCode=' + this.code + '::CourseName='+this.name+'::StartDate='+this.startdate+'::MaxNumStudents='+this.max_of_students;
@@ -680,23 +683,29 @@ companyApp.factory('CoursesService', ['$http', function($http){
 	var api = {
 		 // UPDATED
 		 getCoursesAll : function() {
-			console.log('[INSIDE] getCoursesAll v2');
+			console.log('[INSIDE] getCoursesAll - MONGO UPDATE2');
 			return $http.get('/api/courses')
 		 },
 		 // UPDATED
-		 deleteCourseByCode : function(code) {
-			console.log('[START] deleteCourseByCode("'+code+'") ');
-			return $http.delete('/api/courses/' + code)
-			//console.log('[END] deleteCourseByCode(status='+status+') ');
+		 deleteCourseById : function(id) {
+			console.log('[START] deleteCourseById("'+id+'") - MONGO UPDATE');
+			return $http.delete('/api/courses/' + id)
+			//console.log('[END] deleteCourseById(status='+status+') ');
+		 },
+		 deleteStudent : function(course_id,student_id) {
+			console.log('[START] deleteStudent(course_id='+course_id+'::student_id='+student_id+') ');
+			return $http.delete('/api/courses/' + course_id, student_id);
+			console.log('[END] deleteStudent()');
+			return courses;
 		 },
 		  // UPDATED
 		 editCourse : function(course) {
-			console.log('[START] editCourse v2 (code='+course.code+'::type_code='+course.type_code+'::startdate='+course.startdate+'::location='+course.location+'::status='+course.status+'); ');
-			return $http.put('/api/courses/' + course.code, course)
+			console.log('[START] editCourse v2 (_id='+course._id+'::code='+course.code+'::type_code='+course.type_code+'::startdate='+course.startdate+'::location='+course.location+'::status='+course.status+'); ');
+			return $http.put('/api/courses/' + course._id, course)
 		 },
 		 // UPDATED
 		 addNewCourse : function(newCourse) {
-			console.log('[START] addNewCourse(type_code='+newCourse.type_code+'::startdate='+newCourse.startdate+'::location='+newCourse.location+'::status='+newCourse.status+'); ');
+			console.log('[START] addNewCourse(type_code='+newCourse.type_code+'::startdate='+newCourse.startdate+'::location='+newCourse.location+'::status='+newCourse.status+') - MONGO UPDATE ');
 			var courseTypeDesc = getCourseTypeDesc(newCourse.type_code);
 			var courseNewFinal = new Course(newCourse.type_code+'-'+(courses.length+1), newCourse.type_code, courseTypeDesc, newCourse.startdate,4, newCourse.location, newCourse.status)
 			console.log('[DEBUG] BEFORE courses.length='+courses.length);
@@ -707,11 +716,11 @@ companyApp.factory('CoursesService', ['$http', function($http){
 			//return 'success';
 		 },
 		 // UPDATED
-		 addNewStudent : function(code, student) {
-			console.log('[START] addNewStudent(code='+code  //+'::type_code='+newBooking.type_code
+		 addNewStudent : function(id, student) {
+			console.log('[START] addNewStudent(id='+id  //+'::type_code='+newBooking.type_code
 			+'\n::name='+student.name+'::email='+student.email
 			+'\n::phone='+student.phone+'::address='+student.address+') ');
-          return $http.post('/api/courses/' + code + '/students' ,student);
+          return $http.post('/api/courses/' + id + '/students' ,student);
 			//for(var index = 0; index<courses.length; index++)	{
 			//	console.log('[DEBUG] courses['+index+'].code=' + courses[index].code);
 			//	if (courses[index].code == newBooking.code)
@@ -798,19 +807,6 @@ companyApp.factory('CoursesService', ['$http', function($http){
 		 },
 		 getStudentStatuses : function() {
 			return studentStatuses;
-		 },
-		 deleteStudent : function(course,student) {
-			console.log('[START] deleteStudent(code='+course.code+'::student.id='+student.id+') ');
-			for(var index = 0; index<courses.length; index++)	{
-				console.log('[DEBUG] courses['+index+'].code=' + courses[index].code);
-				if (courses[index].code == course.code)
-				{
-					console.log('[DEBUG] Deleting ' +student.name+ ' (id='+student.id+') from course=' + courses[index].code);
-					courses[index].deleteStudent(student.id);
-				}
-			}
-			console.log('[END] deleteStudent()');
-			return courses;
 		 },
 		 editStudent : function(course,student) {
 			console.log('[START] editStudent(code='+course.code+'::student.id='+student.id+') ');

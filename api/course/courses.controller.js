@@ -1,17 +1,25 @@
 var _ = require('lodash')
-var datastore = require('../datastore');
-
+//var datastore = require('../datastore');
+var Course = require('./course.model');
 var shortId = require('shortid');
+
+
+function handleError(res, err) {
+      return res.send(500, err);
+}
 
 // Get list of courses
 exports.index = function(req, res) {
-	console.log("[START] courses.controller.js - GET ALL");
-    return res.json(200, datastore.courses);
+	console.log("[START] courses.controller.js (MONGO) - GET ALL");
+	Course.find(function (err, courses) {
+            if(err) { return handleError(res, err); }
+            return res.json(200, courses);
+	});
 } ;
 
-// Creates a new course in datastore.
+// Creates a new course
 exports.create = function(req, res) {
-	console.log("[START] courses.controller.js - exports.create(type_code=" + req.params.type_code
+	console.log("[START] courses.controller.js (MONGO) - exports.create(type_code=" + req.params.type_code
 	+ "::name="+req.params.name+ "::startdate="+req.params.startdate
 	+ "::location="+req.params.location+ "::status="+req.params.status+")");
 	var course = {
@@ -24,18 +32,18 @@ exports.create = function(req, res) {
 	   status: req.body.status,
 	   students: []
 	};
-    datastore.courses.push(course)
+    //datastore.courses.push(course)
+    Course.create(req.body, function(err, course) {
+          if (err) { return handleError(res, err); }
+          return res.json(201, course);
+    });
     return res.json(201, course);
 };
 
-// Update an existing course in datastore.
+// Update an existing course
 exports.update = function(req, res) {
-	console.log("[START] courses.controller.js - exports.update(req.params.code=" + req.params.code + ")");
-    var index = _.findIndex(datastore.courses, function(course) {
-              return course.code == req.params.code;
-        });
-    if (index != -1) {
-		var course = datastore.courses[index];
+	console.log("[START] courses.controller.js (MONGO)- exports.update(req.params.id=" + req.params.id + ")");
+	Course.findById(req.params.id, function (err, course) {
 		course.code =  req.body.code;
 		course.type_code = req.body.type_code;
 		course.name = req.body.name;
@@ -43,95 +51,61 @@ exports.update = function(req, res) {
 		//course.max_of_students = req.body.max_of_students;
 		course.location = req.body.location;
 		course.status = req.body.status;
-       	return res.send(200, course)
-    } else {
-        return res.send(404)
-    }
-};
+		course.save(function (err) {
+			if(err) { return handleError(res, err); }
+			return res.send(200, 'Update successful');
+		});
+	});
+ }
 
-// Deletes a course from datastore.
+// Deletes a course
 exports.destroy = function(req, res) {
-	console.log("[START] courses.controller.js - exports.destroy(req.params.code=" + req.params.code + ")");
-    var elements = _.remove(datastore.courses ,
-           function(course) {
-              return course.code == req.params.code;
-        });
-     if (elements.length == 1) {
-        return res.send(200);
-     } else {
-        return res.send(404)
-     }
+	console.log("[START] courses.controller.js (MONGO) - exports.destroy(req.params.id=" + req.params.id + ")");
+    Course.findById(req.params.id, function (err, course) {
+    	course.remove(function (err) {
+			if(err) { return handleError(res, err); }
+                return res.send(200,'Deleted');
+		});
+    })
 };
-// Deletes a student from a course from datastore.
-//exports.delete_student = function(req, res) {
-//	console.log("[START] courses.controller.js - exports.delete_student(req.params.code=" + req.params.code + "::req.params.id="+req.params.id+")");
-//   	var index = _.findIndex(datastore.courses ,
- //          function(course) {
-//              return course.code == req.params.code;
- //       });
-//    if (index != -1) {
- //     var course = datastore.courses[index]
-      //course.students.push(student)
-//	  for (var index = 0 ; index < this.students.length ; index += 1) {
-//				if (this.students[index].id == p_id)
-//				{
-//					this.students.splice(index, 1);
-//				}
-//			}
-//
- //   var elements = _.remove(datastore.courses ,
- //          function(course) {
-//              return course.code == req.params.code;
-//        });
- //    if (elements.length == 1) {
- //       return res.send(200);
-//     } else {
-//        return res.send(404)
-//     }
-//};
-
-//		this.deleteStudent = function(p_id) {
-//			console.log('[DEBUG] Course.deleteStudent(p_id='+p_id+')');
-//			for (var index = 0 ; index < this.students.length ; index += 1) {
-//				if (this.students[index].id == p_id)
-//				{
-//					this.students.splice(index, 1);
-//				}
-//			}
-//		}
-
-//router.delete('/:code/students', controller.delete_student);
 
 // Add a student to a course
 exports.add_student = function(req, res) {
-	console.log("[START] courses.controller.js - exports.add_student(req.params.code=" + req.params.code + "::req.body.name="+req.body.name+")");
-   	var index = _.findIndex(datastore.courses ,
-           function(course) {
-              return course.code == req.params.code;
-        });
-    if (index != -1) {
-      var course = datastore.courses[index]
-      var nextId = 0
-      var last = _.last(course.students)
-      if (last != undefined) {
-         nextId = last.id + 1
-      } else {
-        nextId = 1
-      }
-      var student = {
-              id : nextId ,
+	console.log("[START] courses.controller.js (MONGO) - exports.add_student(req.params.id=" + req.params.id + "::req.body.name="+req.body.name+")");
+	Course.findById(req.params.id, function (err, course) {
+		var student = {
               name: req.body.name,
               email: req.body.email,
               phone: req.body.phone,
               address: req.body.address,
               status: 'draft'
-      }
-       course.students.push(student)
-       return res.send(200, student)
-    } else {
-        return res.send(404)
-    }
+		}
+		course.students.push(student);
+		course.save(function (err) {
+			if(err) { return handleError(res, err); }
+			var last = _.last(course.students)
+			if (last != undefined) {
+				return res.json(200, last);
+			} else {
+				return res.send(500,"Database error");
+			}
+		});
+  });
 };
 
-
-//return $http.post('/api/courses/' + newBooking.code + '/students' , newBooking)
+// Deletes a student from a course
+exports.delete_student = function(req, res) {
+	console.log("[START] courses.controller.js (MONGO) - exports.delete_student(req.params.id=" + req.params.id + ")");
+    Course.findById(req.params.id, function (err, course) {
+		for (var index = 0 ; index < course.students.length ; index += 1) {
+			if (course.students[index]._id == student._id)
+			{
+				course.students.splice(index, 1);
+			}
+		}
+		course.save(function (err) {
+			if(err) { return handleError(res, err); }
+			return res.send(200, 'Delete student was successful');
+		});
+    })
+};

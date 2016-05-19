@@ -76,13 +76,18 @@ companyApp.controller('AdminLoginCtrl', function($rootScope, $scope, $location, 
 	console.log('[END] AdminLoginCtrl');
 });
 
-companyApp.controller('AdminCoursesCtrl', function($rootScope, $scope, $routeParams, CoursesService) {
+companyApp.controller('AdminCoursesCtrl', function($rootScope, $scope, $http, $routeParams, CoursesService) {
 	console.log('[START] AdminCoursesCtrl');
 	// Required for tracking virtual pageviews for Google Analytics
 	ga('set', 'page', '/admin/courses.html');
 	ga('send', 'pageview');
 	$rootScope.pageTitle = "Courses Administration";
-	$scope.courses = CoursesService.getCoursesAll();
+	$scope.courses = [ ];
+
+	CoursesService.getCoursesAll().success(function(courses) {
+		$scope.courses = courses;
+    });
+
 	console.log('$scope.courses.length=' + $scope.courses.length);
 	$scope.sortType = 'startdate'; // set the default sort type
 	$scope.sortReverse = false; // set the default sort order
@@ -98,9 +103,26 @@ companyApp.controller('AdminCoursesCtrl', function($rootScope, $scope, $routePar
 	}
 	$scope.deleteCourseConfirm = function(course) {
 		console.log('[START] deleteCourseConfirm('+course.code+') ');
-		console.log('[DEBUG] Deleting at persistence level');
-		$scope.courses = CoursesService.deleteByCode(course.code);
+		CoursesService.deleteCourseByCode(course.code).success(function(status) {
+			for(var index = 0; index<$scope.courses.length; index++)
+			{
+				if ($scope.courses[index].code == course.code)
+				{
+					$scope.courses.splice(index, 1);
+				}
+			}
+		});
 		$scope.viewCourseCode = "allCourses";
+
+	}
+	$scope.saveCourse = function(editCourse) {
+		console.log('[START] saveCourse(code='+editCourse.code+'::type_code='+editCourse.type_code+'::startdate='+editCourse.startdate+'::location='+editCourse.location+'::status='+editCourse.status);
+		CoursesService.editCourse(editCourse).success(function(updated_course) {
+			editCourse.state = "normal";
+		});
+		$scope.viewCourseCode = "viewCourse";
+		$scope.course = editCourse;
+		console.log('[END] saveCourse() ');
 	}
 	$scope.addCourse = function() {
 		$scope.viewCourseCode = "addNewCourse";
@@ -109,10 +131,15 @@ companyApp.controller('AdminCoursesCtrl', function($rootScope, $scope, $routePar
 	}
 	$scope.addNewCourseSubmit = function() {
 		console.log('[START] addNewCourseSubmit(type_code='+$scope.newCourse.type_code+'::startdate='+$scope.newCourse.startdate+'::location='+$scope.newCourse.location+'::status='+$scope.newCourse.status);
-		$scope.addNewCourseStatus = CoursesService.addNewCourse($scope.newCourse);
+		CoursesService.addNewCourse($scope.newCourse).success(function(new_course) {
+			console.log('[DEBUG] Add new worked');
+			$scope.courses.push(new_course);
+			$scope.newCourse = { };
+		});
 		$scope.viewCourseCode = "allCourses";
 		console.log('[END] addNewCourseSubmit()');
 	}
+
 	$scope.viewCourse = function(course) {
 		console.log('[START] viewCourse(type_code='+course.type_code+') ');
 		$scope.viewCourseCode = "viewCourse";
@@ -142,14 +169,7 @@ companyApp.controller('AdminCoursesCtrl', function($rootScope, $scope, $routePar
 		course.location = course.oldLocation;
 		course.status = course.oldStatus;
 	}
-	$scope.saveCourse = function(editCourse) {
-		console.log('[START] saveCourse(code='+editCourse.code+'::type_code='+editCourse.type_code+'::startdate='+editCourse.startdate+'::location='+editCourse.location+'::status='+editCourse.status);
-		CoursesService.editCourse(editCourse);
-		$scope.viewCourseCode = "viewCourse";
-		editCourse.state = "normal";
-		$scope.course = editCourse;
-		console.log('[END] saveCourse() ');
-	}
+
 	// ############## STUDENT RELATED FUNCTIONS #######################
 	$scope.addStudent = function() {
 		$scope.viewCourseCode = "viewCourse";
@@ -175,16 +195,35 @@ companyApp.controller('AdminCoursesCtrl', function($rootScope, $scope, $routePar
 		$scope.viewCourseCode = "viewCourse";
 	}
 	$scope.addNewStudentSubmit = function() {
-		$scope.newStudent.code = $scope.course.code;
-		console.log('[START] addNewStudentSubmit(newStudent.code='+$scope.newStudent.code
+		//$scope.newStudent.code = $scope.course.code;
+		console.log('[START] addNewStudentSubmit v2($scope.course.code='+$scope.course.code
 		+'\n::$scope.newBooking.name='+$scope.newStudent.name+'::$scope.newBooking.email='+$scope.newStudent.email
 		+'\n::$scope.newBooking.phone='+$scope.newStudent.phone+'::$scope.newBooking.address='+$scope.newStudent.address);
-		$scope.addBookingStatus = CoursesService.addNewStudent($scope.newStudent);
+		CoursesService.addNewStudent($scope.course.code, $scope.newStudent).success(function(newlyAddedStudent) {
+			console.log('[DEBUG] Add new student');
+			$scope.course.students.push(newlyAddedStudent);
+			$scope.newStudent = { };
+		});
+		//$scope.addBookingStatus = CoursesService.addNewStudent($scope.newStudent);
 		$scope.viewCourseCode = "viewCourse";
 		$scope.viewStudentCode = "";
-		$scope.newStudent = "";
+		//$scope.newStudent = "";
 		console.log('[END] addNewStudentSubmit()');
 	}
+    $scope.addComment = function(){
+            if($scope.comment.body === '') { return; }
+            var comment = {
+                body: $scope.comment.body,
+                author: $scope.comment.author
+            }
+            PostsService.addPostComment($scope.post.id, comment )
+                .success(function(added_comment) {
+                    $scope.post.comments.push(added_comment)
+                    $scope.comment = {} ;
+                })
+    }
+
+
 	$scope.editStudent = function(student) {
 		console.log('[START] editStudent() ');
 		student.oldName = student.name;
@@ -408,8 +447,37 @@ companyApp.factory('AdminUserService', [function(){
 
 
 
+companyApp.factory('CoursesServiceX', ['$http', function($http){
+   var api = {
+     getPosts : function() {
+           return $http.get('/api/posts')
+     },
+     addPost : function(post) {
+          return $http.post('/api/posts',post)
+     },
+     addPostComment : function(post_id, comment) {
+          return $http.post('/api/posts/' + post_id + '/comments' ,
+                            comment)
+     },
+     upvotePost : function(post_id, new_upvote_count ) {
+          return $http.post('/api/posts/' + post_id + '/upvotes',
+                     {upvotes: new_upvote_count })
+     },
+     upvotePostComment : function(post_id, comment_id, new_upvote_count ) {
+          return $http.post( '/api/posts/' +
+                      post_id + '/comments/' +  comment_id + '/upvotes',
+                     {upvotes: new_upvote_count })
+     },
+     getPost : function(post_id) {
+        return $http.get('/api/posts/' + post_id )
+     }
+  }
+  return api
+}])
 
-companyApp.factory('CoursesService', [function(){
+
+
+companyApp.factory('CoursesService', ['$http', function($http){
 	function Course(code_in, type_code_in, name_in, startdate_in, max_of_students_in, location_in, status_in) {
 		this.code = code_in;
 		this.type_code = type_code_in;
@@ -610,9 +678,55 @@ companyApp.factory('CoursesService', [function(){
 	}
 
 	var api = {
+		 // UPDATED
 		 getCoursesAll : function() {
-			console.log('[INSIDE] getCoursesAll');
-			return courses
+			console.log('[INSIDE] getCoursesAll v2');
+			return $http.get('/api/courses')
+		 },
+		 // UPDATED
+		 deleteCourseByCode : function(code) {
+			console.log('[START] deleteCourseByCode("'+code+'") ');
+			return $http.delete('/api/courses/' + code)
+			//console.log('[END] deleteCourseByCode(status='+status+') ');
+		 },
+		  // UPDATED
+		 editCourse : function(course) {
+			console.log('[START] editCourse v2 (code='+course.code+'::type_code='+course.type_code+'::startdate='+course.startdate+'::location='+course.location+'::status='+course.status+'); ');
+			return $http.put('/api/courses/' + course.code, course)
+		 },
+		 // UPDATED
+		 addNewCourse : function(newCourse) {
+			console.log('[START] addNewCourse(type_code='+newCourse.type_code+'::startdate='+newCourse.startdate+'::location='+newCourse.location+'::status='+newCourse.status+'); ');
+			var courseTypeDesc = getCourseTypeDesc(newCourse.type_code);
+			var courseNewFinal = new Course(newCourse.type_code+'-'+(courses.length+1), newCourse.type_code, courseTypeDesc, newCourse.startdate,4, newCourse.location, newCourse.status)
+			console.log('[DEBUG] BEFORE courses.length='+courses.length);
+			return $http.post('/api/courses',courseNewFinal);
+			//courses.push(courseNew);
+			//console.log('[DEBUG] AFTER courses.length='+courses.length);
+			//console.log('[END] addNewCourse()');
+			//return 'success';
+		 },
+		 // UPDATED
+		 addNewStudent : function(code, student) {
+			console.log('[START] addNewStudent(code='+code  //+'::type_code='+newBooking.type_code
+			+'\n::name='+student.name+'::email='+student.email
+			+'\n::phone='+student.phone+'::address='+student.address+') ');
+          return $http.post('/api/courses/' + code + '/students' ,student);
+			//for(var index = 0; index<courses.length; index++)	{
+			//	console.log('[DEBUG] courses['+index+'].code=' + courses[index].code);
+			//	if (courses[index].code == newBooking.code)
+			//	{
+			//
+			//		console.log('[DEBUG] courses[index].students.length=' + courses[index].students.length);
+			//		console.log('[DEBUG] BEFORE ' + courses[index].displayInfo());
+			//		console.log('[DEBUG] BEFORE ' + courses[index].displayStudents());
+			//		courses[index].addStudent(newBooking.name, newBooking.email, newBooking.phone, newBooking.address);
+			//		console.log('[DEBUG] AFTER ' + courses[index].displayInfo());
+			//		console.log('[DEBUG] AFTER ' + courses[index].displayStudents());
+			//	}
+			//}
+			//console.log('[END] addNewStudent()');
+			//return 'success';
 		 },
 		 getCoursesOpen : function() {
 			console.log('[INSIDE] getCoursesOpen');
@@ -677,43 +791,13 @@ companyApp.factory('CoursesService', [function(){
 			} )
 			return result
 		 },
-		 deleteByCode : function(code) {
-			console.log('[START] deleteByCode("'+code+'") ');
-			for(var index = 0; index<courses.length; index++)	{
-				if (courses[index].code == code)
-				{
-					courses.splice(index, 1);
-				}
-			}
-			console.log('[END] deleteByCode() ');
-			return courses;
-		 },
+
 		 getCourseStatuses : function() {
 			console.log('[INSIDE] getCourseStatuses');
 			return courseStatuses;
 		 },
 		 getStudentStatuses : function() {
 			return studentStatuses;
-		 },
-		 addNewStudent : function(newBooking) {
-			console.log('[START] addNewStudent(code='+newBooking.code  //+'::type_code='+newBooking.type_code
-			+'\n::name='+newBooking.name+'::email='+newBooking.email
-			+'\n::phone='+newBooking.phone+'::address='+newBooking.address+') ');
-			for(var index = 0; index<courses.length; index++)	{
-				console.log('[DEBUG] courses['+index+'].code=' + courses[index].code);
-				if (courses[index].code == newBooking.code)
-				{
-
-					console.log('[DEBUG] courses[index].students.length=' + courses[index].students.length);
-					console.log('[DEBUG] BEFORE ' + courses[index].displayInfo());
-					console.log('[DEBUG] BEFORE ' + courses[index].displayStudents());
-					courses[index].addStudent(newBooking.name, newBooking.email, newBooking.phone, newBooking.address);
-					console.log('[DEBUG] AFTER ' + courses[index].displayInfo());
-					console.log('[DEBUG] AFTER ' + courses[index].displayStudents());
-				}
-			}
-			console.log('[END] addNewStudent()');
-			return 'success';
 		 },
 		 deleteStudent : function(course,student) {
 			console.log('[START] deleteStudent(code='+course.code+'::student.id='+student.id+') ');
@@ -740,31 +824,8 @@ companyApp.factory('CoursesService', [function(){
 			}
 			console.log('[END] editStudent()');
 			return courses;
-		 },
-		 addNewCourse : function(newCourse) {
-			console.log('[START] addNewCourse(type_code='+newCourse.type_code+'::startdate='+newCourse.startdate+'::location='+newCourse.location+'::status='+newCourse.status+'); ');
-			var courseTypeDesc = getCourseTypeDesc(newCourse.type_code);
-			var courseNew = new Course(newCourse.type_code+'-'+(courses.length+1), newCourse.type_code, courseTypeDesc, newCourse.startdate,4, newCourse.location, newCourse.status)
-			console.log('[DEBUG] BEFORE courses.length='+courses.length);
-			courses.push(courseNew);
-			console.log('[DEBUG] AFTER courses.length='+courses.length);
-			console.log('[END] addNewCourse()');
-			return 'success';
-		 },
-		 editCourse : function(editCourse) {
-			console.log('[START] editCourse(code='+editCourse.code+'::type_code='+editCourse.type_code+'::startdate='+editCourse.startdate+'::location='+editCourse.location+'::status='+editCourse.status+'); ');
-			for(var index = 0; index<courses.length; index++)	{
-				if (courses[index].code == editCourse.code)
-				{
-					console.log('[DEBUG] Code match found, updating Course details');
-					courses[index].startdate = editCourse.startdate;
-					courses[index].location = editCourse.location;
-					courses[index].status = editCourse.status;
-				}
-			}
-			console.log('[END] editCourse()');
-			return 'success';
 		 }
+
 	}
 	return api
 }])

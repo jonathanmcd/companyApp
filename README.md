@@ -9,9 +9,7 @@ to find out info about the company and the courses it provides. It also allows a
 The administrator of the website will be able to log in and view who has booked into courses. 
 The administrator can add and remove courses also.
 
-This is a simple company website that is written in HTML5 and CSS using the Bootstrap framework and AngularJS. 
-Javascript will be used for the client and frontend. NodeJS javscript app server will be used 
-for the backend to hook up to the MonjoDB.
+
 ...... A statement of the app concept and objectives (about 1/2 page) ........
 
 
@@ -24,11 +22,29 @@ for the backend to hook up to the MonjoDB.
  + etc
 
 ###Installation requirements.
+This is a simple SPA website. The frontend is written using HTML5, CSS & Javascript.
+The Bootstrap and AngularJS framework libraries were used to enable me to develop a responsive Single Page Application (SPA). 
+The backend was written using the Javascript language using the NodeJS engine to create a WEB API and MongoDB to persist the data.
+
 . . . .  List of software used to develop the app . . . . . . . 
 + AngularJS 1.x
 + Bootstrap 3
 + etc
 + etc 
+
+You need to install the following software on your machine
++ MongoDB (https://www.mongodb.com/)
++ NodeJS (https://nodejs.org)
+
+
+
+Setup
+Download a clone copy of the sourcecode from GitHub
+Next you need to install all the necessary Node Packages.
+Next you need to confirm MongoDB is running
+
+You need to setup a new database on MongoDB and add sample data
+
 
 
 . . . . . . Also, explain (to a third party) what steps one must take to run your app after cloning it from the repository, e.g. any non-standard software installation ; any environment setup; how to start app; where to view app in browser . . . . . . . 

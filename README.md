@@ -119,11 +119,14 @@ Here is a sample of screenshots to highlight the look and feel of the web pages
 | col 2 is      | centered      |   $12 |
 | zebra stripes | are neat      |    $1 |
 
-|| Routing || Description ||
-| / | - Displays the public facing home page |
-| /about | This view has content explaining info about the company |
+| Routing       | Description                                                                                      |
+|:------------- |:------------------------------------------------------------------------------------------------ | 
+| /             | Displays the public facing home page                                                             | 
+| /about        | This view has content explaining info about the company                                          |  
+| /course/cfr   | This view displays Cardiac First Responder course content and any upcoming open courses for CFR  |   
 
-+ /course/cfr - This view displays Cardiac First Responder course content and any upcoming open courses for CFR
+
++  - 
 + /course/ofa - This view displays Cardiac First Responder course content and any upcoming open courses for CFR
 + /course/ofar - This view displays Cardiac First Responder course content and any upcoming open courses for CFR
 + /course/efa - This view displays Cardiac First Responder course content and any upcoming open courses for CFR

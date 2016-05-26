@@ -136,16 +136,14 @@ Describe your web API.
 | GET: | /api/courses | return a list of ALL courses regardless of status |
 | GET: | /api/courses/:code | return a course details based on course code lookup |
 | GET: | /api/courses/open | return a list of ALL courses that are open to the public to enroll |
-
-
-| GET: /api/courses/open/:type_code | return a list of courses for a particular course type that are open to the public to enroll |
-| GET: /api/courses/open/distinctTypeCodes | return a list of distinct course type codes where courses are open to the public to enroll |
-| POST: /api/courses/ | Create a new Course |
-| POST: /api/courses/:id/students | Add a new student to a course |
-| PUT: /api/courses/:id | Update a Course|
-| PUT: /api/courses/:id/students | Update a Students details on a course |
-| PUT: /api/courses/delete/:id/students | Delete a student from a course |
-| DELETE: /api/courses/:id | Delete a course |
+| GET: | /api/courses/open/:type_code | return a list of courses for a particular course type that are open to the public to enroll |
+| GET: | /api/courses/open/distinctTypeCodes | return a list of distinct course type codes where courses are open to the public to enroll |
+| POST: | /api/courses/ | Create a new Course |
+| POST: | /api/courses/:id/students | Add a new student to a course |
+| PUT: | /api/courses/:id | Update a Course|
+| PUT: | /api/courses/:id/students | Update a Students details on a course |
+| PUT: | /api/courses/delete/:id/students | Delete a student from a course |
+| DELETE: | /api/courses/:id | Delete a course |
 
 
 ###Extra features

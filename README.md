@@ -2,7 +2,7 @@
 
 Name: Jonathan McDonald 
 
-#Overview.
+#1. Overview
 First Aid Responder Training single page web application will allow users to browse a website to learn about the company and the courses it offers. The user will also be able to view a list of upcoming courses and allow them to enroll and book a space on a course.
 
 There is an administration module to the website also which allows the owner to login and maintain the courses vy viewing, adding, editing and deleting courses. The owner will also be able to view who has enrolled into a course. There will be functionality to allow the owner to add, edit and delete a student who is booked into a course.
@@ -16,7 +16,7 @@ List of user features
  + Display a booking page which allows the user to easily enroll in a course.
  + Administration module to allow the owner to maintain courses and students enrolled in courses.
 
-#Installation 
+#2. Installation 
 
 
 List of software used to develop this web application:
@@ -29,7 +29,7 @@ List of software used to develop this web application:
 + Bootstrap v3.3.6
 + jQuery v1.10.2
 
-## Download
+##2.1 Download
 You need to install the following software on your machine
 + GitHub Desktop (https://desktop.github.com/)
 + NodeJS (https://nodejs.org)
@@ -44,7 +44,7 @@ For handiness, You can then get Mongo to Auto Start in Services so you dont need
 sc.exe create MongoDB binPath= "C:\mongodb\bin\mongod.exe --service --config=\"C:\mongodb\mongod.cfg\"" DisplayName= "MongoDB 64bit v3.2.4" start= "auto"
 ```
 
-## Setup
+##2.2 Setup
 **Step 1** - Download a clone copy of the sourcecode from GitHub to your machine. Select a location on your machine where you would like to run the web application from and then open a terminal.
 ```
 C:\WIT\web\companyApp>git clone https://github.com/jonathanmcd/companyApp.git
@@ -76,7 +76,7 @@ Express server listening. 127.0.0.1:4000
 
 
 
-#Data Model Design.
+#3. Data Model Design
 
 The following screenshot images are taken from DbSchema (http://www.dbschema.com/) which shows the simple data model and sample data i used for my application.
 
@@ -87,7 +87,7 @@ The following screenshot images are taken from DbSchema (http://www.dbschema.com
 ![][image3b]
 
 
-#Application Design
+#4. Application Design
 
 This is a simple dynamic single page web application using JavaScript across the frontend and backend to implement a MEAN (MongoDB, Express.js, Angular.js, and Node.js) stack approach. 
 The frontend is written using HTML5, CSS3 & Javascript.
@@ -96,7 +96,7 @@ The backend was written in Javascript using the NodeJS engine to create a WEB AP
 
 ![MEAN Stack][image2]
 
-#UI Design.
+##4.1. UI Design
 Here is a sample of screenshots to highlight the look and feel of the web pages 
 
 ### Home Page
@@ -129,7 +129,7 @@ Here is a sample of screenshots to highlight the look and feel of the web pages
 [image1f]: ./readme_images/ScreenShot-AdminMaintainCourse-AddStudent.PNG
 [image1g]: ./readme_images/ScreenShot-AdminMaintainCourse-EditStudent.PNG
 
-## Routing
+##4.2. Routing
 
 | Routing       | Description                                                                                      |
 |:------------- |:------------------------------------------------------------------------------------------------ | 
@@ -145,7 +145,7 @@ Here is a sample of screenshots to highlight the look and feel of the web pages
 | /admin | Displays the admin login screen |
 | /admin/courses | This view allows the admin user who has successfully logged in to view, add, edit and delete courses. The admin user can also view, edit, delete and add students to a course. |
 
-## Web API Endpoint Reference
+##4.3. Web API Endpoint Reference
 
 | HTTP Method   | URI | Operation |
 |:------------- |:------------- |:-----|
@@ -162,16 +162,12 @@ Here is a sample of screenshots to highlight the look and feel of the web pages
 | DELETE: | /api/courses/:id | Delete a course |
 
 
-###Extra features
+#5. Extra features
 This web application uses a very simple login authetication for the admin module.
 I have added Google Analytics and Google reCAPTCHA. To capture page impressions in Google Analytics for SPA required a bit of tweaking because SPA do not reload web pages when using AnjularJS ng-view 
+
 ![][image4]: 
 
-. . . . . Briefly explain any non-standard features, functional or non-functional (e.g. user registration, authentication) developed for the app . . . . . .  
-
-###Independent learning.
-
-. . . . . State the non-standard aspects of Angular (or other related technologies) that you researched and applied in this assignment . . . . .  
 
  
 [image1a]: ./readme_images/ScreenShot-Home.PNG

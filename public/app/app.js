@@ -57,6 +57,8 @@ companyApp.config(['$routeProvider',
 	  });
 }]);
 
+
+
 companyApp.controller('AdminLoginCtrl', function($rootScope, $scope, $location, AdminUserService) {
 	console.log('[START] AdminLoginCtrl');
 	// Required for tracking virtual pageviews for Google Analytics
@@ -109,6 +111,7 @@ companyApp.controller('AdminCoursesCtrl', function($rootScope, $scope, $http, $r
 				if ($scope.courses[index].code == course.code)
 				{
 					$scope.courses.splice(index, 1);
+					course.state = "normal";
 				}
 			}
 		});
@@ -129,7 +132,7 @@ companyApp.controller('AdminCoursesCtrl', function($rootScope, $scope, $http, $r
 		$scope.courseTypes = CoursesService.getCourseTypesAll();
 		$scope.courseStatuses = CoursesService.getCourseStatuses();
 	}
-	$scope.addNewCourseSubmit = function() {
+	$scope.addNewCourseSubmit = function(course) {
 		console.log('[START] addNewCourseSubmit(type_code='+$scope.newCourse.type_code+'::startdate='+$scope.newCourse.startdate+'::location='+$scope.newCourse.location+'::status='+$scope.newCourse.status);
 		CoursesService.addNewCourse($scope.newCourse).success(function(new_course) {
 			console.log('[DEBUG] Add new worked');
@@ -137,6 +140,12 @@ companyApp.controller('AdminCoursesCtrl', function($rootScope, $scope, $http, $r
 			$scope.newCourse = { };
 		});
 		$scope.viewCourseCode = "allCourses";
+
+		// THIS NEXT BIT IS VERY IMPORTANT
+		// Need to get a fresh list of all courses so NEW course id will be brought back, else we will get errors because it cannot detect the new mongo object id.
+		CoursesService.getCoursesAll().success(function(courses) {
+			$scope.courses = courses;
+	    });		
 		console.log('[END] addNewCourseSubmit()');
 	}
 
@@ -191,7 +200,7 @@ companyApp.controller('AdminCoursesCtrl', function($rootScope, $scope, $http, $r
 		console.log('[START] deleteStudentConfirm(courseCode='+course.code+'::student_id='+student.id+') ');
 		student.state = "normal";
 		console.log('[DEBUG] Deleting at persistence level');
-		CoursesService.deleteStudent(course._id, student._id).success(function(status) {
+		CoursesService.deleteStudent(course._id, student).success(function(status) {
 			for (var index = 0 ; index < course.students.length ; index += 1) {
 				if (course.students[index]._id == student._id)
 				{
@@ -204,7 +213,7 @@ companyApp.controller('AdminCoursesCtrl', function($rootScope, $scope, $http, $r
 	}
 	$scope.addNewStudentSubmit = function() {
 		//$scope.newStudent.code = $scope.course.code;
-		console.log('[START] addNewStudentSubmit v3($scope.course._id='+$scope.course._id
+		console.log('[START] addNewStudentSubmit ($scope.course._id='+$scope.course._id
 		+'\n::$scope.newBooking.name='+$scope.newStudent.name+'::$scope.newBooking.email='+$scope.newStudent.email
 		+'\n::$scope.newBooking.phone='+$scope.newStudent.phone+'::$scope.newBooking.address='+$scope.newStudent.address);
 		CoursesService.addNewStudent($scope.course._id, $scope.newStudent).success(function(newlyAddedStudent) {
@@ -216,19 +225,6 @@ companyApp.controller('AdminCoursesCtrl', function($rootScope, $scope, $http, $r
 		$scope.viewStudentCode = "";
 		console.log('[END] addNewStudentSubmit()');
 	}
-    $scope.addComment = function(){
-            if($scope.comment.body === '') { return; }
-            var comment = {
-                body: $scope.comment.body,
-                author: $scope.comment.author
-            }
-            PostsService.addPostComment($scope.post.id, comment )
-                .success(function(added_comment) {
-                    $scope.post.comments.push(added_comment)
-                    $scope.comment = {} ;
-                })
-    }
-
 
 	$scope.editStudent = function(student) {
 		console.log('[START] editStudent() ');
@@ -241,9 +237,12 @@ companyApp.controller('AdminCoursesCtrl', function($rootScope, $scope, $http, $r
 		console.log('[END] editStudent() ');
 	}
 	$scope.saveEditStudent = function(course,student) {
-		console.log('[START] saveEditStudent() ');
-		student.state = "normal";
-		$scope.courses = CoursesService.editStudent(course,student);
+		console.log('[START] saveEditStudent(course._id='+course._id
+		+'\n::student.name='+student.name+'::student.email='+student.email
+		+'\n::student.phone='+student.phone+'::student.address='+student.address);
+		CoursesService.editStudent(course,student).success(function(updatedStudent) {
+			student.state = "normal";
+		});
 		console.log('[END] saveEditStudent() ');
 	}
 	$scope.cancelEditStudent = function(student) {
@@ -305,30 +304,79 @@ companyApp.controller('BookingCtrl', function($rootScope, $scope, $routeParams, 
 	if(typeof $routeParams.code_id != 'undefined')
 	{
 		console.log('[DEBUG] Parameter detected - $routeParams.code_id=' + $routeParams.code_id);
-		$scope.course = CoursesService.getCourseOpenByCode($routeParams.code_id);
-		if (!$scope.course)
-		{
-			console.log('[WARNING] $routeParams.code_id is NOT a valid course "open" to the public!');
-			// problem detected so we want to display all OPEN courses.
-		}
-		else
-		{
-			$scope.displayAll = false;
-			console.log('[DEBUG] ' + $scope.course.displayInfo());
-		}
+		// TO FIX
+		CoursesService.getCourseOpenByCode($routeParams.code_id).success(function(course) {
+			$scope.course = course;
+			console.log(' :BookingCtrl: Course found. course.type_code=' + course.type_code + '::code=' + course.code);
+			if(typeof $scope.course == 'undefined')
+			{
+				console.log('[WARNING] $routeParams.code_id is NOT a valid course "open" to the public!');
+				// problem detected so we want to display all OPEN courses.
+			}
+			else
+			{
+				$scope.displayAll = false;
+				console.log('[DEBUG] type_code=' + $scope.course.type_code + '::code=' + $scope.course.code + '::location=' + $scope.course.location
+					+ '::startDate=' + $scope.course.startdate+ '::status=' + $scope.course.status);
+			}	
+			if($scope.displayAll == true)
+			{
+				console.log('[DEBUG] :BookingCtrl: Getting all OPEN courses to display.');
+				CoursesService.getCoursesOpen().success(function(courses) {
+					$scope.courses = courses;
+					console.log('[DEBUG] :BookingCtrl: $scope.courses.length=' + $scope.courses.length);
+		    	});	
+		    	// FIX
+				//$scope.courseTypes = CoursesService.getCourseTypesOpen($scope.courses);
+				CoursesService.getCourseOpenDistinctTypeCodes().success(function(courseTypes) {
+					$scope.courseTypes = courseTypes;
+					console.log('[DEBUG] :BookingCtrl: $scope.courseTypes.length=' + $scope.courseTypes.length);
+		    	});			
+
+			}					
+	    });			
+
 	}
-	if($scope.displayAll == true)
+
+	// CoursesService.getCoursesOpenByType('CFR').success(function(courses) {
+	// 	$scope.courses = courses;
+	// 	console.log(' :CourseCFRCtrl: $scope.courses.length=' + $scope.courses.length);
+ //    });	
+
+	if($scope.displayAll == true && typeof $routeParams.code_id == 'undefined')
 	{
-		console.log('[DEBUG] Getting all OPEN courses to display.');
-		$scope.courses = CoursesService.getCoursesOpen();
-		$scope.courseTypes = CoursesService.getCourseTypesOpen();
-		console.log(' :CourseCFRCtrl: $scope.courseTypes.length=' + $scope.courseTypes.length);
+		console.log('[DEBUG] :BookingCtrl: Getting all OPEN courses to display. - $routeParams.code_id == undefined');
+		CoursesService.getCoursesOpen().success(function(courses) {
+			$scope.courses = courses;
+			console.log('[DEBUG] :BookingCtrl: $scope.courses.length=' + $scope.courses.length);
+    	});	
+    	// FIX
+		//$scope.courseTypes = CoursesService.getCourseTypesOpen($scope.courses);
+		CoursesService.getCourseOpenDistinctTypeCodes().success(function(courseTypes) {
+			$scope.courseTypes = courseTypes;
+			console.log('[DEBUG] :BookingCtrl: $scope.courseTypes.length=' + $scope.courseTypes.length);
+    	});			
+
 	}
 	$scope.addBooking = function() {
-		console.log('[DEBUG] $scope.newBooking.code='+$scope.newBooking.code+'::newBooking.type_code='+$scope.newBooking.type_code
+		console.log('[DEBUG] addBooking ($scope.course._id='+$scope.course._id
 		+'\n::$scope.newBooking.name='+$scope.newBooking.name+'::$scope.newBooking.email='+$scope.newBooking.email
 		+'\n::$scope.newBooking.phone='+$scope.newBooking.phone+'::$scope.newBooking.address='+$scope.newBooking.address);
-		$scope.addBookingStatus = CoursesService.addNewStudent($scope.newBooking);
+		CoursesService.addNewStudent($scope.course._id, $scope.newBooking).success(function(newlyAddedStudent) {
+			console.log('[DEBUG] New student added to course ' + $scope.course.code);
+			$scope.course.students.push(newlyAddedStudent);
+			$scope.newBooking = { };
+			console.log('[DEBUG] Changing addBookingStatus to success.');
+			$scope.addBookingStatus == 'success';
+		});
+		// console.log('[DEBUG] $scope.newBooking.code='+$scope.newBooking.code+'::newBooking.type_code='+$scope.newBooking.type_code
+		// +'\n::$scope.newBooking.name='+$scope.newBooking.name+'::$scope.newBooking.email='+$scope.newBooking.email
+		// +'\n::$scope.newBooking.phone='+$scope.newBooking.phone+'::$scope.newBooking.address='+$scope.newBooking.address
+		// +'\n::$scope.course.type_code=' + $scope.course.type_code + '::$scope.course.code=' + $scope.course.code);
+		// // Have to do this for now to set these values which I was expecting to have been set on the web page.
+		// $scope.newBooking.code = $scope.course.code;
+		// $scope.newBooking.type_code = $scope.course.type_code;
+		// $scope.addBookingStatus = CoursesService.addNewStudent($scope.newBooking);
 	}
 	console.log('[END] BookingCtrl');
 })
@@ -353,8 +401,10 @@ companyApp.controller('CourseCFRCtrl', function($rootScope, $scope, CoursesServi
 	ga('send', 'pageview');
 	// Set web page title
 	$rootScope.pageTitle = "Cardiac First Responder";
-	$scope.courses = CoursesService.getCoursesOpenByType('CFR');
-	console.log(' :CourseCFRCtrl: $scope.courses.length=' + $scope.courses.length);
+	CoursesService.getCoursesOpenByType('CFR').success(function(courses) {
+		$scope.courses = courses;
+		console.log(' :CourseCFRCtrl: $scope.courses.length=' + $scope.courses.length);
+    });		
 	$scope.sortType = 'startdate'; // set the default sort type
 	$scope.sortReverse = false; // set the default sort order
 	$scope.searchCourse = ''; // set the default search/filter term
@@ -368,8 +418,10 @@ companyApp.controller('CourseOFACtrl', function($rootScope, $scope, CoursesServi
 	ga('send', 'pageview');
 	// Set web page title
 	$rootScope.pageTitle = "Occupational First Aid";
-	$scope.courses = CoursesService.getCoursesOpenByType('OFA');
-	console.log(' :CourseOFACtrl: $scope.courses.length=' + $scope.courses.length);
+	CoursesService.getCoursesOpenByType('OFA').success(function(courses) {
+		$scope.courses = courses;
+		console.log(' :CourseOFACtrl: $scope.courses.length=' + $scope.courses.length);
+    });			
 	$scope.sortType = 'startdate'; // set the default sort type
 	$scope.sortReverse = false; // set the default sort order
 	$scope.searchCourse = ''; // set the default search/filter term
@@ -383,8 +435,10 @@ companyApp.controller('CourseOFARCtrl', function($rootScope, $scope, CoursesServ
 	ga('send', 'pageview');
 	// Set web page title
 	$rootScope.pageTitle = "Occupational First Aid Refresher";
-	$scope.courses = CoursesService.getCoursesOpenByType('OFAR');
-	console.log(' :CourseOFARCtrl: $scope.courses.length=' + $scope.courses.length);
+	CoursesService.getCoursesOpenByType('OFAR').success(function(courses) {
+		$scope.courses = courses;
+		console.log(' :CourseOFARCtrl: $scope.courses.length=' + $scope.courses.length);
+    });			
 	$scope.sortType = 'startdate'; // set the default sort type
 	$scope.sortReverse = false; // set the default sort order
 	$scope.searchCourse = ''; // set the default search/filter term
@@ -398,8 +452,10 @@ companyApp.controller('CourseEFACtrl', function($rootScope, $scope, CoursesServi
 	ga('send', 'pageview');
 	// Set web page title
 	$rootScope.pageTitle = "Emergency First Aid";
-	$scope.courses = CoursesService.getCoursesOpenByType('EFR');
-	console.log(' :CourseEFACtrl: $scope.courses.length=' + $scope.courses.length);
+	CoursesService.getCoursesOpenByType('EFA').success(function(courses) {
+		$scope.courses = courses;
+		console.log(' :CourseEFACtrl: $scope.courses.length=' + $scope.courses.length);
+    });		
 	$scope.sortType = 'startdate'; // set the default sort type
 	$scope.sortReverse = false; // set the default sort order
 	$scope.searchCourse = ''; // set the default search/filter term
@@ -413,8 +469,10 @@ companyApp.controller('CourseUpcomingCtrl', function($rootScope, $scope, Courses
 	ga('send', 'pageview');
 	// Set web page title
 	$rootScope.pageTitle = "Upcoming Courses";
-	$scope.courses = CoursesService.getCoursesOpen();
-	console.log(' :CourseUpcomingCtrl: $scope.courses.length=' + $scope.courses.length);
+	CoursesService.getCoursesOpen().success(function(courses) {
+		$scope.courses = courses;
+		console.log(' :CourseUpcomingCtrl: $scope.courses.length=' + $scope.courses.length);
+    });	
 	$scope.sortType = 'startdate'; // set the default sort type
 	$scope.sortReverse = false; // set the default sort order
 	$scope.searchCourse = ''; // set the default search/filter term
@@ -452,172 +510,7 @@ companyApp.factory('AdminUserService', [function(){
 	return api
 }])
 
-
-
-companyApp.factory('CoursesServiceX', ['$http', function($http){
-   var api = {
-     getPosts : function() {
-           return $http.get('/api/posts')
-     },
-     addPost : function(post) {
-          return $http.post('/api/posts',post)
-     },
-     addPostComment : function(post_id, comment) {
-          return $http.post('/api/posts/' + post_id + '/comments' ,
-                            comment)
-     },
-     upvotePost : function(post_id, new_upvote_count ) {
-          return $http.post('/api/posts/' + post_id + '/upvotes',
-                     {upvotes: new_upvote_count })
-     },
-     upvotePostComment : function(post_id, comment_id, new_upvote_count ) {
-          return $http.post( '/api/posts/' +
-                      post_id + '/comments/' +  comment_id + '/upvotes',
-                     {upvotes: new_upvote_count })
-     },
-     getPost : function(post_id) {
-        return $http.get('/api/posts/' + post_id )
-     }
-  }
-  return api
-}])
-
-
-
 companyApp.factory('CoursesService', ['$http', function($http){
-	function Course(code_in, type_code_in, name_in, startdate_in, max_of_students_in, location_in, status_in) {
-		this.code = code_in;
-		this.type_code = type_code_in;
-		this.name = name_in;
-		this.startdate = startdate_in;
-		this.max_of_students = max_of_students_in;
-		this.location = location_in;
-		this.status = status_in; //'draft'; // Other status's are open, closed, onhold
-		this.students = [ ];
-
-		this.addStudent = function(p_name, p_email, p_phone, p_address) {
-				console.log('[START] Course.addStudent(p_name='+p_name+'::p_email='+p_email+'::p_phone='+p_phone+'::p_phone='+p_address);
-				// Determine new student id - get max student id and add 1
-				var maxStudentId = 0;
-				console.log('[DEBUG] - maxStudentId='+maxStudentId);
-
-				for (var index = 0 ; index < this.students.length ; index += 1) {
-					console.log('[DEBUG] - students['+index+'].id='+this.students[index].id);
-					if (this.students[index].id > maxStudentId)
-					{
-						maxStudentId = this.students[index].id;
-						console.log('[DEBUG] - NEW maxStudentId='+maxStudentId);
-					}
-				}
-				var newStudentId = maxStudentId + 1;
-				console.log('[DEBUG] newStudentId='+newStudentId);
-				// create student object
-				var student = {id :newStudentId, name : p_name, email : p_email, phone : p_phone, address : p_address};
-				if(this.students.length < this.max_of_students)
-					student.status = 'enrolled'
-				else
-				{
-					student.status = 'waiting'
-				}
-				// Add student object to students array
-				this.students.push(student);
-				console.log('[END] Course.addStudent()');
-		}
-		this.deleteStudent = function(p_id) {
-			console.log('[DEBUG] Course.deleteStudent(p_id='+p_id+')');
-			for (var index = 0 ; index < this.students.length ; index += 1) {
-				if (this.students[index].id == p_id)
-				{
-					this.students.splice(index, 1);
-				}
-			}
-		}
-		this.editStudent = function(p_student) {
-			console.log('[DEBUG] Course.editStudent(student.id='+p_student.id+'::students.length='+this.students.length+')');
-			for(var index = 0; index<this.students.length; index++)	{
-				console.log('[DEBUG] students['+index+'].code=' + this.students[index].id);
-				if (this.students[index].id == p_student.id)
-				{
-					console.log('[DEBUG] Updating ' +p_student.name+ ' (id='+this.students[index].id+')');
-					this.students[index].name = p_student.name;
-					this.students[index].email = p_student.email;
-					this.students[index].phone = p_student.phone;
-					this.students[index].address = p_student.address;
-					this.students[index].status = p_student.status;
-				}
-			}
-		}
-		this.displayInfo = function () {
-			return 'CourseCode=' + this.code + '::CourseName='+this.name+'::StartDate='+this.startdate+'::MaxNumStudents='+this.max_of_students;
-		}
-		this.displayStudents = function () {
-			var studentsString = '';
-			for (var i = 0 ; i < this.students.length ; i += 1) {
-				studentsString = studentsString + 'id=' + this.students[i].id + '::status=' + this.students[i].status+ '::name=' + this.students[i].name
-				+ '::email=' + this.students[i].email+ '::phone=' + this.students[i].phone
-				+ '::address=' + this.students[i].address
-				+ '\n';
-			}
-			return studentsString;
-		}
-	}
-
-
-	var courses = [ ];
-	var course1 = new Course('OFA-1','OFA','OCCUPATIONAL FIRST AID','2016-05-13',4,'Waterford City','open')
-	course1.addStudent('Jonathan McDonald','jon@home.ie','0872223345','13 Jump St, Cork Rd, Waterford')
-	course1.addStudent('Joe Soap','soap@test.ie','00511122323','17 Leap St, Limerick Rd, Waterford')
-	course1.addStudent('Gemma Smith','gemma@dublin.ie','017438349','16 Posh St, St Stephens Green, Dublin 2')
-	course1.addStudent('Graham Little','little@iol.ie','051426172','1 Lower Road, Waterford')
-	course1.addStudent('Guys Bigglesworth','guys@ireland.ie','0882345768','15 Groover Ave, Kilkenny')
-	courses.push(course1);
-
-	var course2 = new Course('CFR-1','CFR','Cardiac First Responder','2014-05-17',3,'Kilkenny City','closed')
-	course2.addStudent('Jenny Smith','jen@home.ie','087443423','26 Jump St, Cork Rd, Waterford')
-	course2.addStudent('John Quinn','quinn@home.ie','00511122323','27 Leap St, Limerick Rd, Waterford')
-	course2.addStudent('Tommy Murphy','tommy@dublin.ie','013245452','27 Posh St, St Stephens Green, Dublin 2')
-	course2.addStudent('Graham Little','little@iol.ie','051426172','2 Lower Road, Waterford')
-	course2.addStudent('Jane Doyle','jane@doyle.ie','0882345768','25 Groover Ave, Cork')
-	courses.push(course2);
-
-	var course3 = new Course('OFA-2','OFA','OCCUPATIONAL FIRST AID','2016-05-30',3,'Kilkenny City','closed')
-	course3.addStudent('Mandy Jones','mandy@waterford.ie','0872223345','37 Jump St, Cork Rd, Waterford')
-	course3.addStudent('Jason Smith','smithy@test.ie','08512132342','31 Leap St, Limerick Rd, Waterford')
-	course3.addStudent('Gemma Powell','gemma@dublin.ie','017438349','388 Posh St, St Stephens Green, Dublin 2')
-	course3.addStudent('Annette Kelly','kelly@iol.ie','021627932','3 Lower Road, Waterford')
-	course3.addStudent('Shay Forristal','shay@se2.ie','061376483','35 Groover Ave, Kilkenny')
-	course3.addStudent('Jimmy Allen','jimmy@test.ie','0612312312','39 Misery Lane, Wexford')
-	courses.push(course3);
-
-	var course4 = new Course('OFA-3','OFA','OCCUPATIONAL FIRST AID','2016-06-14',4,'Waterford City','open')
-	course4.addStudent('Timmy Mallet','timmy@waterford.ie','0872223345','47 Jump St, Cork Rd, Waterford')
-	course4.addStudent('Jason Smith','smithy@test.ie','08512132342','49 Leap St, Limerick Rd, Waterford')
-	course4.addStudent('Gemma Powell','gemma@dublin.ie','017438349','423 Posh St, St Stephens Green, Dublin 2')
-	course4.addStudent('Annette Kelly','kelly@iol.ie','021627932','4 Lower Road, Waterford')
-	course4.addStudent('Shay Forristal','shay@se2.ie','061376483','45 Groover Ave, Kilkenny')
-	courses.push(course4);
-
-	var course5 = new Course('CFR-2','CFR','Cardiac First Responder','2016-06-01',4,'Waterford City','draft')
-	course5.addStudent('Seamus Grant','seamus@home.ie','0872223345','15 Lower Glanmire Rd, Cork')
-	course5.addStudent('Brian Linton','brian@test.ie','0051213213','25 Leap St, Limerick Rd, Waterford')
-	course5.addStudent('Lisa Morris','lisa@dublin.ie','017438349','5 Posh St, St Stephens Green, Dublin 2')
-	courses.push(course5);
-
-	var course6 = new Course('OFAR-1','OFAR','OCCUPATIONAL FIRST AID REFRESHER','2017-01-17',4,'Limerick City','open')
-	courses.push(course6);
-
-	var course7 = new Course('OFAR-2','OFAR','OCCUPATIONAL FIRST AID REFRESHER','2018-06-14',4,'Waterford City','draft')
-	course7.addStudent('Timmy Mallet','timmy@waterford.ie','0872223345','47 Jump St, Cork Rd, Waterford')
-	course7.addStudent('Jason Smith','smithy@test.ie','08512132342','49 Leap St, Limerick Rd, Waterford')
-	course7.addStudent('Gemma Powell','gemma@dublin.ie','017438349','423 Posh St, St Stephens Green, Dublin 2')
-	courses.push(course7);
-
-	var course8 = new Course('CFR-3','CFR','Cardiac First Responder','2016-12-23',4,'Waterford City','open')
-	course8.addStudent('Liam Alyward','seamus@home.ie','0872223345','15 Lower Glanmire Rd, Cork')
-	course8.addStudent('Dudley Moore','brian@test.ie','0051213213','25 Leap St, Limerick Rd, Waterford')
-	course8.addStudent('Lisa Doyle','lisa@dublin.ie','017438349','5 Posh St, St Stephens Green, Dublin 2')
-	courses.push(course8);
-
 	// Populate the type of Courses
 	var courseTypes = [ ];
 	var courseType = {code :'CFR', name : 'Cardiac First Responder'};
@@ -650,147 +543,81 @@ companyApp.factory('CoursesService', ['$http', function($http){
 	studentStatuses.push(studentStatus);
 
 
-
-
-	function isTypeCodeUnique(arrCourseTypes,searchCode){
-		console.log('[START] isTypeCodeUnique (arrCourseTypes.length='+arrCourseTypes.length+'::searchCode='+searchCode+')');
-		blTypeCodeUnique = true;
-
-		arrCourseTypes.forEach(function(courseType){
-				if(courseType.code == searchCode)
-				{
-					console.log('[DEBUG] match found in arrCourseTypes '+searchCode+' -- return false');
-					blTypeCodeUnique = false;
-				}
-			} )
-		console.log('[END] isTypeCodeUnique (blTypeCodeUnique ' + blTypeCodeUnique + ')');
-		return blTypeCodeUnique;
-	}
-
 	function getCourseTypeDesc(type_code) {
-			console.log('[START] getCourseTypeDesc(type_code=' + type_code+ ')');
-			var courseTypeDesc = '??????';
-			courseTypes.forEach(function(courseType){
-				if(courseType.code == type_code)
-				{
+		console.log('[START] getCourseTypeDesc(type_code=' + type_code+ ')');
+		var courseTypeDesc = '??????';
+		courseTypes.forEach(function(courseType){
+			if(courseType.code == type_code)
+			{
 					courseTypeDesc = courseType.name;
-				}
-			} )
-			console.log('[END] getCourseTypeDesc()');
-			return courseTypeDesc;
+			}
+		} )
+		console.log('[END] getCourseTypeDesc()');
+		return courseTypeDesc;
 	}
 
 	var api = {
-		 // UPDATED
+		 // ##############################
+		 //   MONGO RELATED FUNCTIONS
+		 // ##############################
 		 getCoursesAll : function() {
-			console.log('[INSIDE] getCoursesAll - MONGO UPDATE2');
+			console.log('[INSIDE] getCoursesAll - MONGO');
 			return $http.get('/api/courses')
 		 },
-		 // UPDATED
 		 deleteCourseById : function(id) {
-			console.log('[START] deleteCourseById("'+id+'") - MONGO UPDATE');
+			console.log('[START] deleteCourseById("'+id+'") - MONGO');
 			return $http.delete('/api/courses/' + id)
-			//console.log('[END] deleteCourseById(status='+status+') ');
 		 },
-		 deleteStudent : function(course_id,student_id) {
-			console.log('[START] deleteStudent(course_id='+course_id+'::student_id='+student_id+') ');
-			return $http.delete('/api/courses/' + course_id, student_id);
-			console.log('[END] deleteStudent()');
-			return courses;
+		 deleteStudent : function(course_id,student) {
+			console.log('[START] deleteStudent(course_id='+course_id+'::student.id='+student.id+') - MONGO');
+			// DO NOT use $http.delete because we are now deleting an parent course record, we are deleting an array student record, therefore we need use EDIT/PUT
+			return $http.put('/api/courses/delete/' + course_id + '/students',student);
 		 },
-		  // UPDATED
 		 editCourse : function(course) {
-			console.log('[START] editCourse v2 (_id='+course._id+'::code='+course.code+'::type_code='+course.type_code+'::startdate='+course.startdate+'::location='+course.location+'::status='+course.status+'); ');
+			console.log('[START] editCourse (_id='+course._id+'::code='+course.code+'::type_code='+course.type_code+'::startdate='+course.startdate+'::location='+course.location+'::status='+course.status+')  - MONGO');
 			return $http.put('/api/courses/' + course._id, course)
 		 },
-		 // UPDATED
+		 editStudent : function(course,student) {
+			console.log('[START] editStudent(code='+course.code+'::student.id='+student.id+'::student._id=' + student._id +') - MONGO');
+			return $http.put('/api/courses/' + course._id + '/students',student);
+		 },		 		 
 		 addNewCourse : function(newCourse) {
-			console.log('[START] addNewCourse(type_code='+newCourse.type_code+'::startdate='+newCourse.startdate+'::location='+newCourse.location+'::status='+newCourse.status+') - MONGO UPDATE ');
+			console.log('[START] addNewCourse(type_code='+newCourse.type_code+'::startdate='+newCourse.startdate+'::location='+newCourse.location+'::status='+newCourse.status+') - MONGO');
 			var courseTypeDesc = getCourseTypeDesc(newCourse.type_code);
 			var courseNewFinal = new Course(newCourse.type_code+'-'+(courses.length+1), newCourse.type_code, courseTypeDesc, newCourse.startdate,4, newCourse.location, newCourse.status)
 			console.log('[DEBUG] BEFORE courses.length='+courses.length);
 			return $http.post('/api/courses',courseNewFinal);
-			//courses.push(courseNew);
-			//console.log('[DEBUG] AFTER courses.length='+courses.length);
-			//console.log('[END] addNewCourse()');
-			//return 'success';
 		 },
-		 // UPDATED
 		 addNewStudent : function(id, student) {
 			console.log('[START] addNewStudent(id='+id  //+'::type_code='+newBooking.type_code
 			+'\n::name='+student.name+'::email='+student.email
 			+'\n::phone='+student.phone+'::address='+student.address+') ');
-          return $http.post('/api/courses/' + id + '/students' ,student);
-			//for(var index = 0; index<courses.length; index++)	{
-			//	console.log('[DEBUG] courses['+index+'].code=' + courses[index].code);
-			//	if (courses[index].code == newBooking.code)
-			//	{
-			//
-			//		console.log('[DEBUG] courses[index].students.length=' + courses[index].students.length);
-			//		console.log('[DEBUG] BEFORE ' + courses[index].displayInfo());
-			//		console.log('[DEBUG] BEFORE ' + courses[index].displayStudents());
-			//		courses[index].addStudent(newBooking.name, newBooking.email, newBooking.phone, newBooking.address);
-			//		console.log('[DEBUG] AFTER ' + courses[index].displayInfo());
-			//		console.log('[DEBUG] AFTER ' + courses[index].displayStudents());
-			//	}
-			//}
-			//console.log('[END] addNewStudent()');
-			//return 'success';
+        	return $http.post('/api/courses/' + id + '/students' ,student);
 		 },
 		 getCoursesOpen : function() {
-			console.log('[INSIDE] getCoursesOpen');
-			var coursesOpen = [ ];
-			courses.forEach(function(course){
-				console.log('[DEBUG] course.code='+course.code+'::course.status=' + course.status);
-				if(course.status.toUpperCase() === 'OPEN')
-				{
-					coursesOpen.push(course);
-				}
-			} )
-			return coursesOpen;
+			console.log('[INSIDE] getCoursesOpen - MONGO');
+			return $http.get('/api/courses/open')
 		 },
 		 getCoursesOpenByType : function(type_code) {
-			console.log('[INSIDE] getCoursesOpenByType(type_code=' + type_code+ ')');
-			var coursesOpen = [ ];
-			courses.forEach(function(course){
-				if( (course.type_code == type_code) && (course.status.toUpperCase() === 'OPEN') )
-				{
-					coursesOpen.push(course);
-				}
-			} )
-			return coursesOpen;
+			console.log('[INSIDE] getCoursesOpenByType(type_code='+type_code+') - MONGO');
+			return $http.get('/api/courses/open/' + type_code)
 		 },
+		 getCourseOpenDistinctTypeCodes : function() {
+			console.log('[INSIDE] getCourseOpenDistinctTypeCodes - MONGO');
+			return $http.get('/api/courses/open/distinctTypeCodes')		 	
+		 },
+		 getCourseOpenByCode : function(code) {
+			console.log('[INSIDE] getCourseOpenByCode(code='+code+') - MONGO');
+			return $http.get('/api/courses/' + code)		 	
+		 },
+
+		 // ########################################
+		 //   LOCAL STATIC DATA RELATED FUNCTIONS
+		 // ########################################
 		 getCourseTypesAll : function() {
 			console.log('[INSIDE] getCourseTypesAll');
 			return courseTypes;
-		 },
-		 getCourseTypesOpen : function() {
-			// We can only display Course Types that are in status of OPEN so students can enrol into.
-			console.log('[INSIDE] getCourseTypesOpen');
-			var courseTypes = [ ];
-			courses.forEach(function(course){
-				if( course.status.toUpperCase() === 'OPEN' )
-				{
-					if(isTypeCodeUnique(courseTypes,course.type_code))
-					{
-						var courseType = {code :course.type_code, name : course.name};
-						courseTypes.push(courseType);
-					}
-				}
-			} )
-			return courseTypes;
-		 },
-		 getCourseOpenByCode : function(code) {
-			console.log('[INSIDE] getCourseOpenByCode(code=' + code+ ')');
-			var result = null
-			courses.forEach(function(course){
-			   console.log('[DEBUG] course.code='+course.code+'::course.status=' + course.status);
-			   if( (course.code == code) && (course.status.toUpperCase() === 'OPEN') ) {
-				  result  = course
-				}
-			} )
-			return result
-		 },
+		 },		 
 		 getCourseById : function(id) {
 			var result = null
 			courses.forEach(function(course){
@@ -800,7 +627,6 @@ companyApp.factory('CoursesService', ['$http', function($http){
 			} )
 			return result
 		 },
-
 		 getCourseStatuses : function() {
 			console.log('[INSIDE] getCourseStatuses');
 			return courseStatuses;
@@ -808,20 +634,6 @@ companyApp.factory('CoursesService', ['$http', function($http){
 		 getStudentStatuses : function() {
 			return studentStatuses;
 		 },
-		 editStudent : function(course,student) {
-			console.log('[START] editStudent(code='+course.code+'::student.id='+student.id+') ');
-			for(var index = 0; index<courses.length; index++)	{
-				console.log('[DEBUG] courses['+index+'].code=' + courses[index].code);
-				if (courses[index].code == course.code)
-				{
-					console.log('[DEBUG] Updating ' +student.name+ ' (id='+student.id+') from course=' + courses[index].code);
-					courses[index].editStudent(student);
-				}
-			}
-			console.log('[END] editStudent()');
-			return courses;
-		 }
-
 	}
 	return api
 }])

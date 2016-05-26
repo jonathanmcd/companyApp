@@ -94,13 +94,13 @@
 					<div class="form-group">
 						<label for="type_code">Course:</label>
 						<select class="form-control" id="type_code"  readonly="readonly">
-							<option ng-init="newBooking.type_code=course.type_code" ng-model="newBooking.type_code" value="{{course.type_code}}" selected="selected">{{course.name}}</option>
+							<option ng-init="newBooking.type_code=course.type_code" ng-model="newBooking.type_code" value="{{course.type_code}}" selected="selected">{{course.name.toUpperCase()}}</option>
 						</select>
 					</div>
 					<div class="form-group">
 						<label for="code">Date & Venue:</label>
 						<select class="form-control" id="code"  readonly="readonly">
-							<option ng-init="newBooking.code=course.code" ng-model="newBooking.code" value="{{course.code}}" selected="selected">{{course.startdate}} - {{course.location}}</option>
+							<option ng-init="newBooking.code=course.code" ng-model="newBooking.code" value="{{course.code}}" selected="selected">{{course.startdate| date:'dd/MM/yyyy'}} - {{course.location}}</option>
 						</select>
 					</div>			  
 					<div class="form-group">

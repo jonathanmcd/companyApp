@@ -126,9 +126,9 @@
 					
 					<tbody>
 					  <tr ng-repeat="course in courses | orderBy:sortType:sortReverse| filter:searchCourse">
-						  <td>{{course.startdate}}</td>
+						  <td>{{course.startdate| date:'dd/MM/yyyy'}}</td>
 						  <td>{{course.code}}</td>
-						  <td>{{course.name}}</td>
+						  <td>{{course.name.toUpperCase()}}</td>
 						  <td>{{course.location}}</td>		
 						  <td>
 							<a href="#/booking/{{course.code}}" class="btn btn-success">Enrol</a>

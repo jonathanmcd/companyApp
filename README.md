@@ -67,28 +67,55 @@ Diagram of app's data model (see example below) AND/OR a sample of the test data
 Use meaningful sample data. Briefly explain any non-trivial issues.
 
 ###App Design.
-This is a simple SPA website. The frontend is written using HTML5, CSS & Javascript.
+MEAN is a free and open-source JavaScript software stack for building dynamic web sites and web applications.[1]
+
+The MEAN stack makes use of MongoDB, Express.js, Angular.js, and Node.js. Because all components of the MEAN stack support programs written in JavaScript, MEAN applications can be written in one language for both server-side and client-side execution environments.
+
+This is a simple dynamic single page web application using JavaScript across the frontend and backend to implement a MEAN (MongoDB, Express.js, Angular.js, and Node.js) stack approach. 
+The frontend is written using HTML5, CSS3 & Javascript.
 The Bootstrap and AngularJS framework libraries were used to enable me to develop a responsive Single Page Application (SPA). 
-The backend was written using the Javascript language using the NodeJS engine to create a WEB API and MongoDB to persist the data.
+The backend was written in Javascript using the NodeJS engine to create a WEB API and MongoDB to persist the data.
 
 ![MEAN Stack][image2]
 
-###UI Design.
+#UI Design.
+Here is a sample of screenshots to highlight the look and feel of the web pages 
 
-. . . . . Screenshots of app's views (see example below) with appropriate captions (excluding user regeneration and login views) . . . . . . . 
-
+### Home Page
 ![][image1a]: 
+
+### Upcoming courses 
 ![][image1b]: 
+
+### Booking a Course 
 ![][image1c]: 
+
+### Administration Console - Maintain Courses
 ![][image1d]: 
+
+### Administration Console - Maintain a Course
 ![][image1e]: 
+
+### Administration Console - Adding a Student
 ![][image1f]: 
+
+### Administration Console - Modifying a Student
 ![][image1g]: 
 
 
+[image1a]: ./readme_images/ScreenShot-Home.PNG
+[image1b]: ./readme_images/ScreenShot-Upcoming.PNG
+[image1c]: ./readme_images/ScreenShot-Booking.PNG
+[image1d]: ./readme_images/ScreenShot-AdminMaintainCourses.PNG
+[image1e]: ./readme_images/ScreenShot-AdminMaintainCourse.PNG
+[image1f]: ./readme_images/ScreenShot-AdminMaintainCourse-AddStudent.PNG
+[image1g]: ./readme_images/ScreenShot-AdminMaintainCourse-EditStudent.PNG
+
 ###Routing.
-+ / - Displays the public facing home page
-+ /about - This view has content explaining info about the company
+|| Routing || Description ||
+| / | - Displays the public facing home page |
+| /about | This view has content explaining info about the company |
+
 + /course/cfr - This view displays Cardiac First Responder course content and any upcoming open courses for CFR
 + /course/ofa - This view displays Cardiac First Responder course content and any upcoming open courses for CFR
 + /course/ofar - This view displays Cardiac First Responder course content and any upcoming open courses for CFR

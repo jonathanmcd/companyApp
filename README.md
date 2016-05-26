@@ -2,35 +2,33 @@
 
 Name: Jonathan McDonald 
 
-###Overview.
-Company Web Application - First Aid Responder Training This website will allow users to browse a few pages 
-to find out info about the company and the courses it provides. It also allows a visitor to book a course.
+#Overview.
+First Aid Responder Training single page web application will allow users to browse a website to learn about the company and the courses it offers. The user will also be able to view a list of upcoming courses and allow them to enroll and book this place on a course.
 
-The administrator of the website will be able to log in and view who has booked into courses. 
-The administrator can add and remove courses also.
+There is an administration module to the website also which allows the owner to login and maintain the courses vy viewing, adding, editing and deleting courses. The owner will also be able to view who has enrolled into a course. There will be functionality to allow the owner to add, edit and delete a student who is booked into a course.
 
-
-...... A statement of the app concept and objectives (about 1/2 page) ........
-
-
- . . . . . List of user features (excluding user registration and authentication) . . . . 
+List of user features
  
- + Feature 1
- + Feature 2
- + Feature 3
- + etc
- + etc
+ + Display company about us information 
+ + Display contents page for all the courses that the company runs.
+ + Display all upcoming open for enrollment courses and allow the user to enroll.
+ + Display a contact us web page to allow users to send a message to the company
+ + Display a booking page which allows the user to easily enroll in a course.
+ + Administration module to allow the owner to maintain courses and students enrolled in courses.
 
-###Installation requirements.
-This is a simple SPA website. The frontend is written using HTML5, CSS & Javascript.
-The Bootstrap and AngularJS framework libraries were used to enable me to develop a responsive Single Page Application (SPA). 
-The backend was written using the Javascript language using the NodeJS engine to create a WEB API and MongoDB to persist the data.
+#Installation 
 
-. . . .  List of software used to develop the app . . . . . . . 
-+ AngularJS 1.x
-+ Bootstrap 3
-+ etc
-+ etc 
+
+List of software used to develop this SPA
++ HTML5
++ CSS3
++ Javascript
++ NodeJS v4.4.0
++ MongoDB v3.2.6
++ AngularJS v1.2.18
++ Bootstrap v3.3.6
++ jQuery v1.10.2
+
 
 You need to install the following software on your machine
 + MongoDB (https://www.mongodb.com/)
@@ -43,9 +41,20 @@ Download a clone copy of the sourcecode from GitHub
 Next you need to install all the necessary Node Packages.
 Next you need to confirm MongoDB is running
 
+
 You need to setup a new database on MongoDB and add sample data
+Open a command line prompt to the home directory path of the application
+```
+C:\WIT\web\companyApp>node seed.js
+```
 
+####Starting the Application
 
+**Step 1**  - Open a command line prompt to the home directory path of the application
+```
+C:\WIT\web\companyApp>node app.js
+Express server listening. 127.0.0.1:4000
+```
 
 . . . . . . Also, explain (to a third party) what steps one must take to run your app after cloning it from the repository, e.g. any non-standard software installation ; any environment setup; how to start app; where to view app in browser . . . . . . . 
 
@@ -58,10 +67,11 @@ Diagram of app's data model (see example below) AND/OR a sample of the test data
 Use meaningful sample data. Briefly explain any non-trivial issues.
 
 ###App Design.
+This is a simple SPA website. The frontend is written using HTML5, CSS & Javascript.
+The Bootstrap and AngularJS framework libraries were used to enable me to develop a responsive Single Page Application (SPA). 
+The backend was written using the Javascript language using the NodeJS engine to create a WEB API and MongoDB to persist the data.
 
-A simple diagram showing the app's component design, in particular controllers and services (see example below).
-
-![][image2]
+![MEAN Stack][image2]
 
 ###UI Design.
 
@@ -122,15 +132,15 @@ I have added Google Analytics and Google reCAPTCHA. To capture page impressions 
 . . . . . State the non-standard aspects of Angular (or other related technologies) that you researched and applied in this assignment . . . . .  
 
  
-[image1a]: ./ScreenShot-Home.PNG
-[image1b]: ./ScreenShot-Upcoming.PNG
-[image1c]: ./ScreenShot-Booking.PNG
-[image1d]: ./ScreenShot-AdminMaintainCourses.PNG
-[image1e]: ./ScreenShot-AdminMaintainCourse.PNG
-[image1f]: ./ScreenShot-AdminMaintainCourse-AddStudent.PNG
-[image1g]: ./ScreenShot-AdminMaintainCourse-EditStudent.PNG
-[image2]: ./design.png
-[image3]: ./model.png
-[image4]: ./ScreenShot-GoogleAnalytics.PNG
+[image1a]: ./readme_images/ScreenShot-Home.PNG
+[image1b]: ./readme_images/ScreenShot-Upcoming.PNG
+[image1c]: ./readme_images/ScreenShot-Booking.PNG
+[image1d]: ./readme_images/ScreenShot-AdminMaintainCourses.PNG
+[image1e]: ./readme_images/ScreenShot-AdminMaintainCourse.PNG
+[image1f]: ./readme_images/ScreenShot-AdminMaintainCourse-AddStudent.PNG
+[image1g]: ./readme_images/ScreenShot-AdminMaintainCourse-EditStudent.PNG
+[image2]: ./readme_images/MEAN_Stack.PNG
+[image3]: ./readme_images/model.png
+[image4]: ./readme_images/ScreenShot-GoogleAnalytics.PNG
 
 

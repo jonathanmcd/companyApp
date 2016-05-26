@@ -111,7 +111,14 @@ Here is a sample of screenshots to highlight the look and feel of the web pages
 [image1f]: ./readme_images/ScreenShot-AdminMaintainCourse-AddStudent.PNG
 [image1g]: ./readme_images/ScreenShot-AdminMaintainCourse-EditStudent.PNG
 
-###Routing.
+## Routing
+
+| Tables        | Are           | Cool  |
+| ------------- |:-------------:| -----:|
+| col 3 is      | right-aligned | $1600 |
+| col 2 is      | centered      |   $12 |
+| zebra stripes | are neat      |    $1 |
+
 || Routing || Description ||
 | / | - Displays the public facing home page |
 | /about | This view has content explaining info about the company |

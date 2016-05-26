@@ -77,7 +77,8 @@ A simple diagram showing the app's component design, in particular controllers a
 
 Describe your web API.
 
-HTTP Verb & Path |  Description 
+
+HTTP Verb &amp; Path | Description
 -- | --
 GET: /api/courses | return a list of ALL courses regardless of status
 GET: /api/courses/:code | return a course details based on course code lookup

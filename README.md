@@ -77,11 +77,12 @@ A simple diagram showing the app's component design, in particular controllers a
 
 Describe your web API.
 
-| HTTP Verb & Path |  Description |
-| -- | -- |
-| GET: /api/courses | return a list of ALL courses regardless of status |
-| GET: /api/courses/:code | return a course details based on course code lookup |
-| GET: /api/courses/open | return a list of ALL courses that are open to the public to enroll |
+HTTP Verb & Path |  Description 
+-- | --
+GET: /api/courses | return a list of ALL courses regardless of status
+GET: /api/courses/:code | return a course details based on course code lookup
+GET: /api/courses/open | return a list of ALL courses that are open to the public to enroll
+
 | GET: /api/courses/open/:type_code | return a list of courses for a particular course type that are open to the public to enroll |
 | GET: /api/courses/open/distinctTypeCodes | return a list of distinct course type codes where courses are open to the public to enroll |
 | POST: /api/courses/ | Create a new Course |

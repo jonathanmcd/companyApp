@@ -113,39 +113,30 @@ Here is a sample of screenshots to highlight the look and feel of the web pages
 
 ## Routing
 
-| Tables        | Are           | Cool  |
-| ------------- |:-------------:| -----:|
-| col 3 is      | right-aligned | $1600 |
-| col 2 is      | centered      |   $12 |
-| zebra stripes | are neat      |    $1 |
-
 | Routing       | Description                                                                                      |
 |:------------- |:------------------------------------------------------------------------------------------------ | 
 | /             | Displays the public facing home page                                                             | 
 | /about        | This view has content explaining info about the company                                          |  
 | /course/cfr   | This view displays Cardiac First Responder course content and any upcoming open courses for CFR  |   
-
-
-+  - 
-+ /course/ofa - This view displays Cardiac First Responder course content and any upcoming open courses for CFR
-+ /course/ofar - This view displays Cardiac First Responder course content and any upcoming open courses for CFR
-+ /course/efa - This view displays Cardiac First Responder course content and any upcoming open courses for CFR
-+ /course/upcoming - Displays a list of all courses currently open that users can enroll and book themselves into a course.
-+ /booking - This view allows the web user to select any of the courses currently open for enrollment. The user then enters their details and book themselves into a course they have choosen.
-+ /booking/:code_id - This view allows the user to book into a course they have selected from another screen. A specific course is displayed because the user selected it and they just have to then enter their personal contact details.
-+ /admin - Displays the admin login screen
-+ /admin/courses - This view allows the admin user who has successfully logged in to view, add, edit and delete courses. The admin user can also view, edit, delete and add students to a course.
+| /course/ofa   | This view displays Occuptional First Aider course content and any upcoming open courses for OFA  |
+| /course/ofar  | This view displays Occuptional First Aider Refresher course content and any upcoming open courses for OFAR |
+| /course/efa   | This view displays Emergency First Aid course content and any upcoming open courses for EFA |
+| /course/upcoming | Displays a list of all courses currently open that users can enroll and book themselves into a course. |
+| /booking | This view allows the web user to select any of the courses currently open for enrollment. The user then enters their details and book themselves into a course they have choosen. |
+| /booking/:code_id | This view allows the user to book into a course they have selected from another screen. A specific course is displayed because the user selected it and they just have to then enter their personal contact details. |
+| /admin | Displays the admin login screen |
+| /admin/courses | This view allows the admin user who has successfully logged in to view, add, edit and delete courses. The admin user can also view, edit, delete and add students to a course. |
 
 ## Web API Endpoint Reference
 
 Describe your web API.
 
+| HTTP Method   | URI | Operation |
+|:------------- |:------------- |:-----|
+| GET: | /api/courses | return a list of ALL courses regardless of status |
+| GET: | /api/courses/:code | return a course details based on course code lookup |
+| GET: | /api/courses/open | return a list of ALL courses that are open to the public to enroll |
 
-HTTP Verb &amp; Path | Description
--- | --
-GET: /api/courses | return a list of ALL courses regardless of status
-GET: /api/courses/:code | return a course details based on course code lookup
-GET: /api/courses/open | return a list of ALL courses that are open to the public to enroll
 
 | GET: /api/courses/open/:type_code | return a list of courses for a particular course type that are open to the public to enroll |
 | GET: /api/courses/open/distinctTypeCodes | return a list of distinct course type codes where courses are open to the public to enroll |

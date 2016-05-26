@@ -3,7 +3,7 @@
 Name: Jonathan McDonald 
 
 #Overview.
-First Aid Responder Training single page web application will allow users to browse a website to learn about the company and the courses it offers. The user will also be able to view a list of upcoming courses and allow them to enroll and book this place on a course.
+First Aid Responder Training single page web application will allow users to browse a website to learn about the company and the courses it offers. The user will also be able to view a list of upcoming courses and allow them to enroll and book a space on a course.
 
 There is an administration module to the website also which allows the owner to login and maintain the courses vy viewing, adding, editing and deleting courses. The owner will also be able to view who has enrolled into a course. There will be functionality to allow the owner to add, edit and delete a student who is booked into a course.
 
@@ -34,6 +34,7 @@ You need to install the following software on your machine
 + GitHub Desktop (https://desktop.github.com/)
 + NodeJS (https://nodejs.org)
 + MongoDB (https://www.mongodb.com/)
+
 You can force Mongo to be installed in C:\mongodb by typing the following at the DOS prompt in the download directory where Mongo install file is located.
 ```
 msiexec.exe /q /i mongodb-win32-x86_64-3.2.4-signed.msi INSTALLLOCATION="C:\mongodb" ADDLOCAL="all"
@@ -60,8 +61,8 @@ MongoDB shell version: 3.2.4
 connecting to: 127.0.0.1/test
 > show dbs
 ```
-**Step 4** - You need to setup a new database on MongoDB and add sample data
-Open a command line prompt to the home directory path of the application
+**Step 4** - You need to setup a new database on MongoDB and add sample data.
+Open a command line prompt to the home directory path of the application and run the seed program to add the data to MongoDB.
 ```
 C:\WIT\web\companyApp>node seed.js
 ```
@@ -75,18 +76,18 @@ Express server listening. 127.0.0.1:4000
 
 
 
-###Data Model Design.
+#Data Model Design.
 
-Diagram of app's data model (see example below) AND/OR a sample of the test data used (JSON or equivalent).
+The following screenshot images are taken from DbSchema (http://www.dbschema.com/) which shows the simple data model and sample data i used for my application.
 
-![][image1]
+### Tables/Collections
+![][image3a]
 
-Use meaningful sample data. Briefly explain any non-trivial issues.
+### Data 
+![][image3b]
 
-###App Design.
-MEAN is a free and open-source JavaScript software stack for building dynamic web sites and web applications.[1]
 
-The MEAN stack makes use of MongoDB, Express.js, Angular.js, and Node.js. Because all components of the MEAN stack support programs written in JavaScript, MEAN applications can be written in one language for both server-side and client-side execution environments.
+#Application Design
 
 This is a simple dynamic single page web application using JavaScript across the frontend and backend to implement a MEAN (MongoDB, Express.js, Angular.js, and Node.js) stack approach. 
 The frontend is written using HTML5, CSS3 & Javascript.
@@ -181,7 +182,8 @@ I have added Google Analytics and Google reCAPTCHA. To capture page impressions 
 [image1f]: ./readme_images/ScreenShot-AdminMaintainCourse-AddStudent.PNG
 [image1g]: ./readme_images/ScreenShot-AdminMaintainCourse-EditStudent.PNG
 [image2]: ./readme_images/MEAN_Stack.PNG
-[image3]: ./readme_images/model.png
+[image3a]: ./readme_images/ScreenShot-DbSchema-Model.PNG
+[image3b]: ./readme_images/ScreenShot-DbSchema-Model-Data.PNG
 [image4]: ./readme_images/ScreenShot-GoogleAnalytics.PNG
 
 

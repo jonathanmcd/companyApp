@@ -1,4 +1,4 @@
-#Assignment 2 - MEAN app.
+#EWD2016 Assignment 1 & 2
 
 Name: Jonathan McDonald 
 
@@ -19,7 +19,7 @@ List of user features
 #Installation 
 
 
-List of software used to develop this SPA
+List of software used to develop this web application:
 + HTML5
 + CSS3
 + Javascript
@@ -29,34 +29,51 @@ List of software used to develop this SPA
 + Bootstrap v3.3.6
 + jQuery v1.10.2
 
-
+## Download
 You need to install the following software on your machine
-+ MongoDB (https://www.mongodb.com/)
++ GitHub Desktop (https://desktop.github.com/)
 + NodeJS (https://nodejs.org)
++ MongoDB (https://www.mongodb.com/)
+You can force Mongo to be installed in C:\mongodb by typing the following at the DOS prompt in the download directory where Mongo install file is located.
+```
+msiexec.exe /q /i mongodb-win32-x86_64-3.2.4-signed.msi INSTALLLOCATION="C:\mongodb" ADDLOCAL="all"
+```
+For handiness, You can then get Mongo to Auto Start in Services so you dont need to worry about starting it.
+```
+sc.exe create MongoDB binPath= "C:\mongodb\bin\mongod.exe --service --config=\"C:\mongodb\mongod.cfg\"" DisplayName= "MongoDB 64bit v3.2.4" start= "auto"
+```
 
-
-
-Setup
-Download a clone copy of the sourcecode from GitHub
-Next you need to install all the necessary Node Packages.
-Next you need to confirm MongoDB is running
-
-
-You need to setup a new database on MongoDB and add sample data
+## Setup
+**Step 1** - Download a clone copy of the sourcecode from GitHub to your machine. Select a location on your machine where you would like to run the web application from and then open a terminal.
+```
+C:\WIT\web\companyApp>git clone https://github.com/jonathanmcd/companyApp.git
+```
+**Step 2** - Next you need to install all the necessary Node Packages. There is a file called "package.json" which contains a list of all the necessary node packages required. To install these packages you just type the following command in the terminal.
+```
+C:\WIT\web\companyApp>npm install
+```
+**Step 3** - Next you need to confirm MongoDB is running. 
+```
+C:\mongodb\bin>mongo 127.0.0.1
+2016-05-26T12:01:04.310+0100 I CONTROL  [main] Hotfix KB2731284 or later update
+MongoDB shell version: 3.2.4
+connecting to: 127.0.0.1/test
+> show dbs
+```
+**Step 4** - You need to setup a new database on MongoDB and add sample data
 Open a command line prompt to the home directory path of the application
 ```
 C:\WIT\web\companyApp>node seed.js
 ```
-
-####Starting the Application
-
-**Step 1**  - Open a command line prompt to the home directory path of the application
+**Step 5** - To start the Web Application open a command line prompt to the home directory path of the application
 ```
 C:\WIT\web\companyApp>node app.js
 Express server listening. 127.0.0.1:4000
 ```
 
-. . . . . . Also, explain (to a third party) what steps one must take to run your app after cloning it from the repository, e.g. any non-standard software installation ; any environment setup; how to start app; where to view app in browser . . . . . . . 
+**Step 6** - Start Google Chrome and type in 127.0.0.1:4000 into the web address and hey bingo it should work for you.
+
+
 
 ###Data Model Design.
 
@@ -128,8 +145,6 @@ Here is a sample of screenshots to highlight the look and feel of the web pages
 | /admin/courses | This view allows the admin user who has successfully logged in to view, add, edit and delete courses. The admin user can also view, edit, delete and add students to a course. |
 
 ## Web API Endpoint Reference
-
-Describe your web API.
 
 | HTTP Method   | URI | Operation |
 |:------------- |:------------- |:-----|
